@@ -1289,7 +1289,7 @@ function initHkForestQuiz() {
         "Manakah daftar nomor kontak darurat resmi pada bagian Layanan Siaga Karhutla HutanKita yang tepat untuk melaporkan kebakaran hutan, bencana kabut asap, dan kejahatan kehutanan?",
       options: [
         {
-          text: "Damkar 113, Pusdalops BPBD 112, Penegakan Hukum Polri & Gakkum 110, serta WhatsApp Posko Manggala Agni 0811-9620-1123.",
+          text: "Damkar 113, Pusdalops BPBD 112, Penegakan Hukum Polri & Gakkum 110, serta WhatsApp Posko HutanKita 0838-4365-3251.",
           isCorrect: true
         },
         {
@@ -1306,7 +1306,7 @@ function initHkForestQuiz() {
         }
       ],
       explanation:
-        "Bagian Kontak Darurat Karhutla mencantumkan Damkar Siaga 113, BPBD Bencana 112, Gakkum & Polri 110, serta WhatsApp Official Manggala Agni +62 811-9620-1123."
+        "Bagian Kontak Darurat Karhutla mencantumkan Damkar Siaga 113, BPBD Bencana 112, Gakkum & Polri 110, serta WhatsApp Official Posko HutanKita +62 838-4365-3251."
     }
   ];
 

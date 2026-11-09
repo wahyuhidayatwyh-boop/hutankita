@@ -200,6 +200,7 @@ Hasil pengujian menggunakan Google Lighthouse 13.5.0 melalui server lokal (`http
 - **Nama tim:** HutanKita
 - **Ketua (satu-satunya anggota):** Wahyu Hidayat
 - **Kampus:** Telkom University Purwokerto
+- **WhatsApp:** +62 838-4365-3251 (https://wa.me/6283843653251)
 - **Email:** wahyuhidayat.wyh@gmail.com
 - **Instagram:** @whyuhdyat___ (https://instagram.com/whyuhdyat___)
 - **Repo GitHub:** https://github.com/wahyuhidayatwyh-boop/hutankita

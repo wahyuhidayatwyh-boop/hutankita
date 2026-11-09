@@ -238,6 +238,42 @@ summary:focus-visible,
   }
 }
 
+/* Penyelarasan Presisi Icon & Teks pada Tag Pill Gerakan Pelestarian Rimba Nusantara */
+.section-tag-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  vertical-align: middle !important;
+  line-height: 1 !important;
+}
+
+.section-tag-pill svg {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  vertical-align: middle !important;
+  flex-shrink: 0 !important;
+  width: 14px !important;
+  height: 14px !important;
+}
+
+.section-tag-pill span {
+  display: inline-flex !important;
+  align-items: center !important;
+  line-height: 1 !important;
+  vertical-align: middle !important;
+}
+
+.section-tag-pill.pill-nature {
+  background: rgba(16, 185, 129, 0.16) !important;
+  border: 1px solid rgba(52, 211, 153, 0.45) !important;
+  color: #6ee7b7 !important;
+}
+
+.section-tag-pill.pill-nature svg {
+  color: #34d399 !important;
+}
+
 /* ==========================================================================
    TOMBOL PEMICU POP-UP KUIS DI AREA ANATOMI POHON (#anatomi-pohon)
    ========================================================================== */
