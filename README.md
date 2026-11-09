@@ -190,7 +190,7 @@ Hasil pengujian menggunakan Google Lighthouse 13.5.0 melalui server lokal (`http
 
 | Kategori Pengujian | Skor Desktop | Skor Mobile |
 | :--- | :--- | :--- |
-| Performance | 50 | 42 |
+| Performance | 74 | 58 |
 | Accessibility | 100 | 100 |
 | Best Practices | 100 | 100 |
 | SEO | 100 | 100 |
