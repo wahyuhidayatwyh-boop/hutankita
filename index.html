@@ -1,0 +1,1655 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HutanKita - Edukasi Hutan Tropis Indonesia</title>
+  <!-- HK-PATCH: Meta description, theme-color, dan Open Graph untuk SEO & aksesibilitas -->
+  <meta name="description"
+    content="HutanKita adalah portal edukasi hutan hujan tropis Indonesia dengan visualisasi 3D relief kepulauan, anatomi pohon 3D, informasi sanksi hukum kehutanan, dan peta titik panas satelit.">
+  <meta name="theme-color" content="#050b07">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="id_ID">
+  <meta property="og:site_name" content="HutanKita">
+  <meta property="og:title" content="HutanKita - Edukasi Hutan Tropis Indonesia">
+  <meta property="og:description"
+    content="Portal edukasi hutan hujan tropis Indonesia dengan visualisasi 3D relief kepulauan, anatomi pohon 3D, informasi hukum kehutanan, dan peta titik panas satelit.">
+  <meta property="og:image" content="assets/images/logo-tab.webp">
+  <!-- /HK-PATCH -->
+  <link rel="icon" type="image/webp" href="assets/images/logo-tab.webp">
+  <link rel="apple-touch-icon" href="assets/images/logo-tab.webp">
+
+  <!-- Google Fonts: Outfit (Seragam di seluruh halaman) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+
+  <!-- Three.js 3D Library & Base64 Textures (CORS-safe for local file://) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+  <script src="js/map-assets.js" defer></script>
+  <script src="js/tree-assets.js" defer></script>
+
+  <!-- Leaflet CSS & JS for Real-Time Hotspot Map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
+
+  <link rel="stylesheet" href="css/style.css">
+  <!-- HK-PATCH: Stylesheet tambahan untuk bagian Tentang, Kontak, dan fitur baru -->
+  <link rel="stylesheet" href="css/tambahan.css">
+</head>
+
+<body class="is-preloading">
+  <!-- HK-PATCH: Skip link untuk navigasi keyboard langsung ke konten utama -->
+  <a href="#konten-utama" class="hk-skip-link">Lewati ke konten utama</a>
+
+  <!-- ======================================================================
+       LOADING SCREEN (INITIAL LOAD & REFRESH)
+       ====================================================================== -->
+  <div class="site-preloader" id="sitePreloader" aria-live="polite" aria-label="Memuat website HutanKita">
+    <div class="preloader-backdrop"></div>
+    <div class="preloader-content">
+      <div class="preloader-brand">
+        <span class="brand-text">HutanKita<span class="dot">.</span></span>
+      </div>
+      <p class="preloader-desc">Menjelajahi keajaiban rimba &amp; ekosistem paru-paru dunia nusantara</p>
+      <div class="preloader-bar-wrap">
+        <div class="preloader-bar" id="preloaderBar">
+          <div class="preloader-progress" id="preloaderProgress"></div>
+        </div>
+        <div class="preloader-status">
+          <span class="preloader-status-text" id="preloaderStatusText">Memuat ekosistem...</span>
+          <span class="preloader-percent" id="preloaderPercent">0%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       SLIDE 1: FULLSCREEN LANDING HERO (100VH)
+       ====================================================================== -->
+  <section class="hero-fullscreen" id="hero">
+
+    <!-- Background Video Cover -->
+    <video class="hero-video" autoplay muted loop playsinline>
+      <source src="assets/videos/hero-video.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+
+    <!-- Cinematic Vignette Overlay -->
+    <div class="hero-overlay"></div>
+
+    <!-- Top Navigation Bar -->
+    <header class="hero-nav">
+      <div class="nav-brand">
+        <span class="brand-text">HutanKita<span class="dot">.</span></span>
+      </div>
+
+      <nav class="nav-links">
+        <a href="#hero" class="nav-link">Home</a>
+        <a href="#edukasi" class="nav-link">Anatomi</a>
+        <a href="#perusakan-hutan" class="nav-link">Krisis Hutan</a>
+        <a href="#galeri-hutan" class="nav-link">Galeri</a>
+        <a href="#peta-titik-api" class="nav-link">Peta Api</a>
+        <a href="#kontak-darurat" class="nav-link">Kontak Darurat</a>
+
+      </nav>
+
+      <div class="nav-actions">
+        <!-- Expandable Search Box -->
+        <div class="search-box" id="navSearchBox">
+          <input type="text" class="search-input" id="searchInput" placeholder="Cari materi rimba, satwa, api..."
+            autocomplete="off" spellcheck="false">
+          <button class="search-clear-btn hidden" id="searchClearBtn" type="button" aria-label="Hapus teks pencarian">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+          <button class="search-btn" id="searchBtn" aria-label="Cari" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </button>
+          <!-- Search Results Dropdown -->
+          <div class="search-results-dropdown" id="searchResultsDropdown" role="region" aria-label="Hasil Pencarian">
+          </div>
+        </div>
+
+        <!-- Audio Mute/Unmute Toggle -->
+        <button class="sound-btn" id="soundBtn" aria-label="Toggle Video Sound" title="Sound Muted">
+          <svg id="soundMutedIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <line x1="23" y1="9" x2="17" y2="15"></line>
+            <line x1="17" y1="9" x2="23" y2="15"></line>
+          </svg>
+          <svg id="soundActiveIcon" class="hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Bottom Content Area -->
+    <div class="hero-bottom-content">
+      <div class="content-left">
+        <h1 class="hero-title">HutanKita<span class="dot">.</span></h1>
+        <p class="hero-desc">
+          HutanKita adalah platform yang membantu Anda tetap fokus pada hal-hal penting dalam kehidupan.
+        </p>
+      </div>
+
+      <!-- Center Scroll Cue -->
+      <div class="scroll-cue" id="scrollCue">
+        <span class="cue-text">SCROLL</span>
+        <div class="cue-line"></div>
+      </div>
+
+      <!-- Right Official Badges -->
+      <div class="content-right">
+        <div class="badge-item">
+          <div class="badge-circle">ID</div>
+          <div class="badge-text">
+            <span>GOV</span>
+            <span>INDONESIA</span>
+          </div>
+        </div>
+
+        <div class="badge-item">
+          <div class="badge-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path>
+              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path>
+            </svg>
+          </div>
+          <div class="badge-text">
+            <span>SAVE</span>
+            <span>HUTANKITA</span>
+          </div>
+        </div>
+
+        <div class="badge-item">
+          <div class="badge-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M8 20V14"></path>
+              <path d="M8 14L4 14l3-4H5l3-4-3-4h6l-3 4h2l-3 4h3z"></path>
+              <path d="M16 20v-5"></path>
+              <path d="M16 15l-3 0 2-3h-2l2.5-3.5h-1.5L16 5l2 3.5h-1.5l2.5 3.5h-2l3 0z"></path>
+            </svg>
+          </div>
+          <div class="badge-text">
+            <span>LIVE</span>
+            <span>GREEN</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- HK-PATCH: Pembungkus utama konten setelah hero sampai sebelum footer -->
+  <main id="konten-utama" tabindex="-1">
+
+    <!-- ======================================================================
+       SLIDE 2: EDUKASI HUTAN INDONESIA & PETA INTERAKTIF
+       Kiri: Teks simple & enak dibaca (font Outfit)
+       Kanan: Peta Indonesia (assets/images/peta.webp) -> Diklik berganti ke peta-penjelasan.webp
+       ====================================================================== -->
+    <section class="edu-section" id="edukasi">
+      <div class="edu-container">
+
+        <!-- KOLOM KIRI: TEKS EDUKASI SIMPLE, BERSIH, ENAK DIBACA -->
+        <div class="edu-text-col">
+          <span class="edu-kicker">Edukasi Rimba Nusantara</span>
+
+          <h2 class="edu-title">
+            Paru-paru <span class="title-accent">Nusantara.</span>
+          </h2>
+
+          <p class="edu-lead">
+            Indonesia merupakan benteng zamrud khatulistiwa dengan keanekaragaman hayati terkaya ketiga di dunia,
+            membentang melintasi ribuan pulau dari Sabang hingga Merauke.
+          </p>
+
+          <div class="edu-body">
+            <p>
+              Menaungi lebih dari 120 juta hektar kawasan hutan tropis alami, kepulauan Indonesia menjadi rumah bagi
+              lebih
+              dari 30.000 spesies flora berpembuluh serta ribuan fauna khas yang tidak dapat dijumpai di belahan bumi
+              mana
+              pun.
+            </p>
+            <p>
+              Hutan tropis Indonesia berfungsi sebagai spons penyerap karbon global alami terbesar, mengunci miliaran
+              ton
+              cadangan karbon bumi sekaligus menghasilkan pasokan oksigen murni bagi kelangsungan generasi dunia.
+            </p>
+          </div>
+
+          <!-- STATISTIK UTAMA (SIMPLE & ELEGAN) -->
+          <div class="edu-stats-row">
+            <div class="stat-item">
+              <span class="stat-number">120+ Jt Ha</span>
+              <span class="stat-label">Tutupan Hutan Tropis</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">30.000+</span>
+              <span class="stat-label">Spesies Flora Tropis</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">10%</span>
+              <span class="stat-label">Hutan Tropis Dunia</span>
+            </div>
+          </div>
+
+          <!-- TOMBOL PINTAS GANTI MODE PETA / SCROLL CUE -->
+          <div class="edu-action-bar">
+            <button class="action-toggle-btn" id="btnActionToggleMap">
+              <span class="btn-icon">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="3" y1="9" x2="21" y2="9"></line>
+                  <line x1="9" y1="21" x2="9" y2="9"></line>
+                </svg>
+              </span>
+              <span id="actionBtnLabel">Buka Peta Penjelasan Data</span>
+            </button>
+
+            <a href="#anatomi-pohon" class="edu-scroll-cue">
+              <span class="scroll-dot"></span>
+              <span class="scroll-text">Gulir ke bawah untuk eksplorasi anatomi pohon 3D</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- KOLOM KANAN: PETA INTERAKTIF INDONESIA (BEBAS MELAYANG, TANPA CARD) -->
+        <div class="edu-3d-col">
+          <div class="canvas-3d-stage" id="mapInteractiveStage">
+
+            <!-- Layer 1: Peta 3D Relief (assets/images/peta.webp) -->
+            <div class="map-view-layer map-3d-view active" id="view3DLayer">
+              <canvas id="indonesia3DCanvas" class="three-canvas"></canvas>
+              <img src="assets/images/peta.webp" alt="Peta Indonesia 3D Relief" class="map-fallback-img"
+                id="mapFallbackImg">
+            </div>
+
+            <!-- Layer 2: Peta Penjelasan Data (assets/images/peta-penjelasan.webp) -->
+            <div class="map-view-layer map-explanation-view" id="viewExplanationLayer">
+              <img src="assets/images/peta-penjelasan.webp" alt="Peta Penjelasan Hutan Indonesia"
+                class="explanation-map-img" id="imgExplanation">
+            </div>
+
+            <!-- Floating Interactive Switcher & Hint (Tanpa Card) -->
+            <div class="floating-map-switcher">
+              <button class="switcher-pill-btn active" id="btnSwitchTo3D">
+                <span>Relief 3D</span>
+              </button>
+              <button class="switcher-pill-btn" id="btnSwitchToExplanation">
+                <span>Data Penjelasan</span>
+              </button>
+            </div>
+
+            <div class="floating-hint" id="mapHintBadge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path
+                  d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122">
+                </path>
+              </svg>
+              <span id="hintBadgeText">Klik peta untuk melihat data penjelasan wilayah</span>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ====================================================================
+         BAGIAN BAWAH (DALAM BACKGROUND YANG SAMA):
+         POHON 3D REALISTIS UTUH (AKAR SAMPAI DAun) - KLIK & ZOOM INTERAKTIF
+         ==================================================================== -->
+      <!-- ====================================================================
+         BAGIAN BAWAH (DALAM BACKGROUND YANG SAMA):
+         POHON 3D REALISTIS UTUH - RATA TENGAH (CENTERED) & SPACE BESAR
+         ==================================================================== -->
+      <div class="tree-centered-container" id="anatomi-pohon">
+
+        <!-- 1. MODEL POHON 3D UTUH (SPACE BESAR, RATA TENGAH) -->
+        <div class="tree-stage-wrapper">
+          <div class="tree-3d-stage" id="treeInteractiveStage">
+
+            <!-- WebGL 3D Tree Canvas + Fallback Image -->
+            <div class="map-view-layer active" id="tree3DLayer">
+              <canvas id="tree3DCanvas" class="three-canvas"></canvas>
+              <img src="assets/images/pohon-3d.webp" alt="Pohon Hutan Tropis 3D Utuh" class="tree-fallback-img"
+                id="treeFallbackImg">
+            </div>
+
+            <!-- Titik Hotspot Interaktif pada Bagian Pohon -->
+            <div class="tree-hotspots-layer" id="treeHotspotsLayer">
+              <button class="tree-hotspot" data-part="daun" id="hotspot-daun" type="button" aria-label="Lihat Daun">
+                <span class="hotspot-dot"></span>
+                <span class="hotspot-label">Daun &amp; Kanopi</span>
+              </button>
+              <button class="tree-hotspot" data-part="dahan" id="hotspot-dahan" type="button" aria-label="Lihat Dahan">
+                <span class="hotspot-dot"></span>
+                <span class="hotspot-label">Dahan &amp; Cabang</span>
+              </button>
+              <button class="tree-hotspot" data-part="batang" id="hotspot-batang" type="button"
+                aria-label="Lihat Batang">
+                <span class="hotspot-dot"></span>
+                <span class="hotspot-label">Batang Kayu</span>
+              </button>
+              <button class="tree-hotspot" data-part="akar" id="hotspot-akar" type="button" aria-label="Lihat Akar">
+                <span class="hotspot-dot"></span>
+                <span class="hotspot-label">Akar Banir</span>
+              </button>
+            </div>
+
+            <!-- Kontrol Zoom & Reset Melayang Bebas -->
+            <div class="floating-map-switcher">
+              <button class="switcher-pill-btn" id="btnTreeZoomIn" type="button" title="Perbesar (Zoom In)">
+                <span>+ Zoom</span>
+              </button>
+              <button class="switcher-pill-btn" id="btnTreeZoomOut" type="button" title="Perkecil (Zoom Out)">
+                <span>− Zoom</span>
+              </button>
+              <button class="switcher-pill-btn active" id="btnTreeReset" type="button" title="Tampilkan Pohon Utuh">
+                <span>Pohon Utuh</span>
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 2. JUDUL RATA TENGAH DI BAWAH POHON & NAVIGASI TOMBOL (TANPA BADGE & KATEGORI) -->
+        <div class="tree-center-header">
+          <h2 class="tree-center-title">
+            Keajaiban Struktur <span class="title-accent">Pohon Raksasa.</span>
+          </h2>
+          <p class="tree-center-desc">
+            Pohon emergent hutan hujan tropis menjulang lebih dari 60 meter. Klik bagian pohon di atas untuk mempelajari
+            detail lapisan struktur biologisnya.
+          </p>
+
+          <!-- Navigasi Bagian Pohon (Simpel & Elegan) -->
+          <div class="tree-part-nav" role="group" aria-label="Navigasi bagian pohon">
+            <button class="part-pill-btn active" data-part="utuh" type="button">
+              <span>Pohon Utuh</span>
+            </button>
+            <button class="part-pill-btn" data-part="akar" type="button">
+              <span>Akar Banir</span>
+            </button>
+            <button class="part-pill-btn" data-part="batang" type="button">
+              <span>Batang Kayu</span>
+            </button>
+            <button class="part-pill-btn" data-part="dahan" type="button">
+              <span>Dahan &amp; Cabang</span>
+            </button>
+            <button class="part-pill-btn" data-part="daun" type="button">
+              <span>Daun &amp; Kanopi</span>
+            </button>
+          </div>
+
+          <!-- HK-PATCH: Tombol Kuis Interaktif di Area Anatomi (Membuka Pop-Up Kuis 15 Soal & Sertifikat) -->
+          <div class="hk-anatomi-quiz-cta">
+            <button class="btn-cta-primary hk-btn-open-quiz" id="btnOpenQuizModal" type="button">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z">
+                </path>
+              </svg>
+              <span>Uji Pemahaman: Kuis Ekosistem &amp; Sertifikat (15 Soal)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. DETAIL LAPISAN ANATOMI (TANPA CARD, FOTO UTAMA + FOTO TAMBAHAN DI SAMPINGNYA + DESKRIPSI) -->
+        <div class="tree-detail-drawer" id="treeDetailDrawer">
+          <div class="detail-seamless-wrapper">
+
+            <!-- Dua Foto Berdampingan (Foto Utama + Foto Tambahan di Sampingnya) -->
+            <div class="detail-photos-row">
+              <div class="detail-photo-frame photo-main">
+                <img src="assets/images/akar1.webp" alt="Foto Utama Lapisan Anatomi" class="detail-layer-img"
+                  id="detailImgMain">
+              </div>
+              <div class="detail-photo-frame photo-secondary">
+                <img src="assets/images/akar2.webp" alt="Foto Tambahan Lapisan Anatomi" class="detail-layer-img"
+                  id="detailImgSecondary">
+              </div>
+            </div>
+
+            <!-- Hanya Deskripsi Murni Tanpa Card, Judul, Kategori, atau Badge -->
+            <div class="detail-desc-wrapper">
+              <div class="detail-pure-desc" id="detailPureDesc">
+                <!-- Deskripsi mendalam tentang lapisan struktur dan manfaat lingkungan terisi di sini -->
+              </div>
+              <div class="detail-actions-row">
+                <button class="btn-clean-reset" id="btnCloseDetail" type="button">
+                  <span>Kembali ke Pohon Utuh</span>
+                </button>
+                <button class="btn-clean-reset hk-btn-open-quiz-inline" id="btnOpenQuizFromDetail" type="button">
+                  <span>Mulai Kuis Anatomi &amp; Rimba (15 Soal)</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ====================================================================
+       SLIDE 3: ANCAMAN PERUSAKAN HUTAN OLEH MANUSIA
+       Background Panorama: assets/images/bg-ancaman.webp
+       1. 2 Foto Kerusakan Berdampingan (Penebangan Pohon Masif & Kebakaran Hutan)
+       2. Hukuman Perusakan Hutan (Sanksi Pidana, Denda Puluhan Miliar, & UU RI)
+       3. Frame Video YouTube Investigasi Kerusakan Hutan
+       ==================================================================== -->
+    <section class="destruction-section" id="perusakan-hutan">
+
+      <!-- Background Panoramic Image (assets/images/bg-ancaman.webp) -->
+      <div class="destruction-bg-layer" style="background-image: url('assets/images/bg-ancaman.webp');"></div>
+      <div class="destruction-bg-overlay"></div>
+
+      <div class="destruction-inner-content">
+
+        <!-- 1. Header Slide 3 -->
+        <div class="destruction-header">
+
+          <h2 class="destruction-main-title">
+            Ancaman Nyata: <span class="title-accent-danger">Perusakan Hutan</span> oleh Manusia
+          </h2>
+          <p class="destruction-main-desc">
+            Eksploitasi tak terkendali, ancaman jeratan sanksi pidana kehutanan di Indonesia, serta rekaman investigasi
+            nyata kehancuran zamrud khatulistiwa.
+          </p>
+        </div>
+
+        <!-- 2. FOTO KERUSAKAN NYAMBUNG JADI 1 (TULISAN LANGSUNG DI DALAM FOTO) -->
+        <div class="unified-crisis-banner">
+
+          <!-- Sisi Kiri: Penebangan Liar (Foto & Teks di Dalamnya) -->
+          <div class="crisis-half half-logging">
+            <!-- HK-PATCH: Tambah loading="lazy" dan decoding="async" -->
+            <img src="assets/images/crisis-penebangan.webp" alt="Penebangan Pohon Masif dan Deforestasi Liar"
+              class="crisis-half-img" loading="lazy" decoding="async">
+            <div class="crisis-half-overlay"></div>
+
+            <div class="crisis-half-content">
+              <h3 class="crisis-title-in-photo">Pembalakan Hutan Tropis</h3>
+              <p class="crisis-desc-in-photo">
+                Penjarahan pohon purba bernilai tinggi (Meranti, Ulin, Damar) yang merusak sistem perakaran penopang
+                lereng, melenyapkan kanopi penahan hujan, dan memicu bencana banjir bandang serta erosi lereng masif.
+              </p>
+            </div>
+          </div>
+
+          <!-- Garis Pemisah Vertikal Halus (Kedua Foto Menyambung Jadi 1) -->
+          <div class="crisis-center-divider"></div>
+
+          <!-- Sisi Kanan: Kebakaran Hutan (Foto & Teks di Dalamnya) -->
+          <div class="crisis-half half-fire">
+            <!-- HK-PATCH: Tambah loading="lazy" dan decoding="async" -->
+            <img src="assets/images/crisis-kebakaran.webp" alt="Kebakaran Hutan dan Lahan Gambut Tropis"
+              class="crisis-half-img" loading="lazy" decoding="async">
+            <div class="crisis-half-overlay"></div>
+
+            <div class="crisis-half-content">
+              <h3 class="crisis-title-in-photo">Kebakaran Gambut (Karhutla)</h3>
+              <p class="crisis-desc-in-photo">
+                Pembakaran biomassa yang menyulut bara bawah tanah kubah gambut hingga kedalaman belasan meter. Memicu
+                kabut asap beracun lintas batas, memusnahkan plasma nutfah, serta melepaskan megaton gas karbon.
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 3. HUKUMAN PERUSAKAN HUTAN (CARD INTERAKTIF BISA DIBUKA DAN DITUTUP) -->
+        <div class="penalties-section" id="hukuman-perusakan">
+          <div class="penalties-header">
+
+            <h3 class="penalties-title">
+              Hukuman &amp; Sanksi Pidana <span class="title-accent-danger">Perusakan Hutan</span>
+            </h3>
+            <p class="penalties-desc">
+              Undang-Undang Republik Indonesia menetapkan sanksi pidana kurungan berat, denda bernilai puluhan miliar
+              rupiah, serta perampasan seluruh aset bagi pelaku perorangan maupun korporasi. Klik card di bawah untuk
+              membuka dan menutup rincian hukumannya.
+            </p>
+          </div>
+
+          <div class="penalties-accordion-list">
+
+            <!-- Card Sanksi 1: Penebangan Liar (Bisa Dibuka / Ditutup) -->
+            <div class="penalty-accordion-card" id="penaltyCardLogging">
+              <button class="penalty-accordion-header" type="button" aria-expanded="false">
+                <div class="accordion-header-left">
+                  <div class="penalty-icon-wrap icon-logging">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                      <line x1="3" y1="6" x2="21" y2="6"></line>
+                      <path d="M16 10a4 4 0 0 1-8 0"></path>
+                    </svg>
+                  </div>
+                  <div class="accordion-title-meta">
+                    <h4 class="accordion-card-title">Sanksi Penebangan Liar (Illegal Logging)</h4>
+                    <span class="penalty-law-tag">UU No. 18 Tahun 2013 (P3H)</span>
+                  </div>
+                </div>
+
+                <div class="accordion-header-right">
+                  <div class="accordion-chevron-wrap">
+                    <span class="chevron-action-text">Detail</span>
+                    <svg class="accordion-chevron" viewBox="0 0 24 24" width="18" height="18" fill="none"
+                      stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                  </div>
+                </div>
+              </button>
+
+              <!-- Bagian yang Bisa Dibuka & Ditutup -->
+              <div class="penalty-accordion-body">
+                <div class="accordion-body-inner">
+                  <div class="penalty-summary-metrics">
+                    <div class="metric-box">
+                      <span class="metric-label">Hukuman Kurungan</span>
+                      <span class="metric-val danger">3 - 15 Tahun</span>
+                      <span class="metric-sub">Pidana penjara maksimal</span>
+                    </div>
+                    <div class="metric-box">
+                      <span class="metric-label">Denda Finansial</span>
+                      <span class="metric-val warning">Rp 100 Miliar</span>
+                      <span class="metric-sub">Maksimal korporasi/cukong</span>
+                    </div>
+                    <div class="metric-box">
+                      <span class="metric-label">Sanksi Aset</span>
+                      <span class="metric-val success">Sita &amp; Rampas</span>
+                      <span class="metric-sub">Alat berat &amp; kayu disita</span>
+                    </div>
+                  </div>
+
+                  <ul class="penalty-points-list">
+                    <li><strong>Pasal 82 - 84 UU P3H:</strong> Penebangan pohon tanpa izin di dalam kawasan hutan
+                      konservasi atau lindung, pemuatan, pengangkutan, serta penadahan kayu tanpa Surat Keterangan
+                      Sahnya
+                      Hasil Hutan (SKSHH) diancam kurungan penjara maksimal 15 tahun.</li>
+                    <li><strong>Pemberatan Korporasi:</strong> Pelaku korporasi, direksi, komisaris, maupun
+                      pemodal/cukong
+                      kayu diancam pidana denda hingga <strong>Rp 100 Miliar</strong> dan pemberatan sepertiga hukuman
+                      pokok.</li>
+                    <li><strong>Perampasan Total Aset:</strong> Seluruh alat berat (eskavator, buldoser), gergaji mesin
+                      (chainsaw), armada truk pengangkut, dan seluruh tegakan kayu hasil tebangan ilegal dirampas untuk
+                      kas negara.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card Sanksi 2: Pembakaran Hutan (Bisa Dibuka / Ditutup) -->
+            <div class="penalty-accordion-card" id="penaltyCardFire">
+              <button class="penalty-accordion-header" type="button" aria-expanded="false">
+                <div class="accordion-header-left">
+                  <div class="penalty-icon-wrap icon-fire">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <path
+                        d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z">
+                      </path>
+                    </svg>
+                  </div>
+                  <div class="accordion-title-meta">
+                    <h4 class="accordion-card-title">Sanksi Pembakaran Hutan (Karhutla)</h4>
+                    <span class="penalty-law-tag">UU No. 32/2009 (PPLH) &amp; UU 41/1999</span>
+                  </div>
+                </div>
+
+                <div class="accordion-header-right">
+                  <div class="accordion-chevron-wrap">
+                    <span class="chevron-action-text">Detail</span>
+                    <svg class="accordion-chevron" viewBox="0 0 24 24" width="18" height="18" fill="none"
+                      stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                  </div>
+                </div>
+              </button>
+
+              <!-- Bagian yang Bisa Dibuka & Ditutup -->
+              <div class="penalty-accordion-body">
+                <div class="accordion-body-inner">
+                  <div class="penalty-summary-metrics">
+                    <div class="metric-box">
+                      <span class="metric-label">Hukuman Kurungan</span>
+                      <span class="metric-val danger">3 - 15 Tahun</span>
+                      <span class="metric-sub">Pasal 108 UU PPLH</span>
+                    </div>
+                    <div class="metric-box">
+                      <span class="metric-label">Denda Pidana</span>
+                      <span class="metric-val warning">Rp 15 Miliar</span>
+                      <span class="metric-sub">Denda pencemaran lingkungan</span>
+                    </div>
+                    <div class="metric-box">
+                      <span class="metric-label">Sanksi Korporasi</span>
+                      <span class="metric-val danger">Cabut Izin HGU</span>
+                      <span class="metric-sub">Ganti rugi restorasi lahan</span>
+                    </div>
+                  </div>
+
+                  <ul class="penalty-points-list">
+                    <li><strong>Pasal 108 UU No. 32/2009:</strong> Setiap orang yang melakukan pembukaan lahan dengan
+                      cara
+                      membakar diancam pidana penjara paling singkat 3 tahun dan paling lama 10 hingga 15 tahun serta
+                      denda hingga Rp 15 Miliar.</li>
+                    <li><strong>Prinsip Pertanggungjawaban Mutlak (Strict Liability):</strong> Korporasi pemegang izin
+                      HGU
+                      bertanggung jawab mutlak atas setiap titik kebakaran yang terjadi di areal konsesinya tanpa perlu
+                      pembuktian unsur kesalahan sengaja/lalai.</li>
+                    <li><strong>Pencabutan Izin &amp; Pemulihan Ekologis:</strong> Pembekuan dan pencabutan izin usaha
+                      secara permanen, sita jaminan perdata, dan kewajiban ganti rugi pemulihan ekologis tanah gambut
+                      bernilai miliaran rupiah.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card Sanksi 3: Perusakan Hayati & Satwa Dilindungi (Bisa Dibuka / Ditutup) -->
+            <div class="penalty-accordion-card" id="penaltyCardWildlife">
+              <button class="penalty-accordion-header" type="button" aria-expanded="false">
+                <div class="accordion-header-left">
+                  <div class="penalty-icon-wrap icon-wildlife">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                  </div>
+                  <div class="accordion-title-meta">
+                    <h4 class="accordion-card-title">Perusakan Habitat Hayati &amp; Satwa Dilindungi</h4>
+                    <span class="penalty-law-tag">UU No. 5 Tahun 1990 (KSDAE)</span>
+                  </div>
+                </div>
+
+                <div class="accordion-header-right">
+                  <div class="accordion-chevron-wrap">
+                    <span class="chevron-action-text">Detail</span>
+                    <svg class="accordion-chevron" viewBox="0 0 24 24" width="18" height="18" fill="none"
+                      stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                  </div>
+                </div>
+              </button>
+
+              <!-- Bagian yang Bisa Dibuka & Ditutup -->
+              <div class="penalty-accordion-body">
+                <div class="accordion-body-inner">
+                  <div class="penalty-summary-metrics">
+                    <div class="metric-box">
+                      <span class="metric-label">Hukuman Kurungan</span>
+                      <span class="metric-val danger">5 - 10 Tahun</span>
+                      <span class="metric-sub">Pasal 40 UU KSDAE</span>
+                    </div>
+                    <div class="metric-box">
+                      <span class="metric-label">Denda Pidana</span>
+                      <span class="metric-val warning">Rp 5 Miliar</span>
+                      <span class="metric-sub">Denda perusakan satwa/flora</span>
+                    </div>
+                    <div class="metric-box">
+                      <span class="metric-label">Status Perlindungan</span>
+                      <span class="metric-val success">Pidana Berlapis</span>
+                      <span class="metric-sub">Flora &amp; fauna dilindungi</span>
+                    </div>
+                  </div>
+
+                  <ul class="penalty-points-list">
+                    <li><strong>Pasal 21 &amp; 40 UU KSDAE:</strong> Larangan menangkap, melukai, membunuh, menyimpan,
+                      memiliki, memelihara, mengangkut, dan memperniagakan satwa yang dilindungi (seperti Orangutan,
+                      Harimau Sumatera, Gajah Sumatera, Badak Jawa) maupun bagian tubuhnya.</li>
+                    <li><strong>Perlindungan Flora Purba Langka:</strong> Menjerat siapa pun yang menebang, merusak,
+                      mengambil, atau memindahkan tumbuhan langka dilindungi seperti Ulin purba, Damar, Cendana, Kantong
+                      Semar, dan bunga Padma Raksasa (*Rafflesia arnoldii*).</li>
+                    <li><strong>Rehabilitasi Wajib:</strong> Pelaku dikenakan kewajiban pembiayaan penuh rehabilitasi
+                      satwa ke habitat aslinya dan restorasi zona konservasi suaka margasatwa.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ======================================================================
+       SLIDE 4: GALERI DOKUMENTASI AKSI NYATA (BACKGROUND assets/images/bg-galeri.webp)
+       SLIDER CARD GESER HINGGA POJOK BATAS LAYAR TANPA KEPOTONG
+       ====================================================================== -->
+    <section class="gallery-section" id="galeri-hutan">
+      <div class="gallery-bg-overlay"></div>
+
+      <!-- Gallery Header -->
+      <div class="gallery-header">
+
+        <h2 class="gallery-main-title">
+          Galeri Rekaman: <span class="title-accent-gradient">Aksi Nyata &amp; Penyelamatan</span>
+        </h2>
+        <p class="gallery-main-desc">
+          Dokumentasi visual patroli rimba nusantara, penindakan pembalakan liar, operasi pemadaman karhutla lahan
+          gambut,
+          serta upaya restorasi pohon purba Indonesia.
+        </p>
+      </div>
+
+      <!-- Carousel Container Full-Width Sampai Pojok Batas Layar -->
+      <div class="doc-carousel-container" id="docCarouselContainer">
+
+        <!-- Tombol Navigasi Melayang di Sisi Layar -->
+        <button class="doc-nav-btn btn-prev" id="docBtnPrev" type="button" aria-label="Sebelumnya">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+
+        <button class="doc-nav-btn btn-next" id="docBtnNext" type="button" aria-label="Berikutnya">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+
+        <!-- Viewport & Track Slider Geser Penuh Sampai Pojok -->
+        <div class="doc-carousel-viewport" id="docCarouselViewport">
+          <div class="doc-carousel-track" id="docCarouselTrack">
+
+            <!-- Card 1: Patroli Ranger Hutan -->
+            <div class="doc-card" data-index="0">
+              <!-- HK-PATCH: Tambah loading="lazy" dan decoding="async" -->
+              <img src="assets/images/Penyisiran Zona Inti Rimba.webp" alt="Patroli Ranger Hutan" class="doc-card-img"
+                loading="lazy" decoding="async">
+              <div class="doc-card-overlay"></div>
+              <div class="doc-card-content">
+                <h3 class="doc-card-title">Penyisiran Zona Inti Rimba</h3>
+                <p class="doc-card-desc">Operasi terpadu polisi kehutanan menyusuri batas taman nasional untuk
+                  membongkar
+                  jerat dan mencegah perambahan liar.</p>
+              </div>
+            </div>
+
+            <!-- Card 2: Pemadaman Karhutla (Manggala Agni) -->
+            <div class="doc-card" data-index="1">
+              <!-- HK-PATCH: Tambah loading="lazy" dan decoding="async" -->
+              <img src="assets/images/Pemadaman Bara Gambut.webp" alt="Pemadaman Api Lahan Gambut" class="doc-card-img"
+                loading="lazy" decoding="async">
+              <div class="doc-card-overlay"></div>
+              <div class="doc-card-content">
+                <h3 class="doc-card-title">Pemadaman Bara Gambut</h3>
+                <p class="doc-card-desc">Satuan Manggala Agni memadamkan api bawah tanah di kubah gambut yang rawan
+                  menjalar
+                  luas saat musim kemarau ekstrem.</p>
+              </div>
+            </div>
+
+            <!-- Card 3: Penyelamatan Satwa Endemik -->
+            <div class="doc-card" data-index="2">
+              <!-- HK-PATCH: Tambah loading="lazy" dan decoding="async" -->
+              <img src="assets/images/Evakuasi & Pelepasliaran.webp" alt="Penyelamatan Satwa Orangutan"
+                class="doc-card-img" loading="lazy" decoding="async">
+              <div class="doc-card-overlay"></div>
+              <div class="doc-card-content">
+                <h3 class="doc-card-title">Evakuasi &amp; Pelepasliaran</h3>
+                <p class="doc-card-desc">Penyelamatan induk dan bayi orangutan dari areal kebakaran konsesi menuju
+                  stasiun
+                  rehabilitasi dan suaka hutan lindung.</p>
+              </div>
+            </div>
+
+            <!-- Card 4: Operasi Penindakan Pembalakan Liar -->
+            <div class="doc-card" data-index="3">
+              <!-- HK-PATCH: Tambah loading="lazy" dan decoding="async" -->
+              <img src="assets/images/penyitaan-kayu.webp" alt="Penyitaan Kayu Ilegal" class="doc-card-img"
+                loading="lazy" decoding="async">
+              <div class="doc-card-overlay"></div>
+              <div class="doc-card-content">
+                <h3 class="doc-card-title">Penyitaan Armada &amp; Kayu</h3>
+                <p class="doc-card-desc">Penyegelan barang bukti buldoser, truk logging, dan ribuan batang kayu bulat
+                  hasil
+                  operasi tangkap tangan pembalakan liar.</p>
+              </div>
+            </div>
+
+            <!-- Card 5: Pemantauan Satelit & Drone -->
+            <div class="doc-card" data-index="4">
+              <!-- HK-PATCH: Tambah loading="lazy" dan decoding="async" -->
+              <img src="assets/images/Deteksi Titik Api Real-Time.webp" alt="Pemantauan Satelit Hutan"
+                class="doc-card-img" loading="lazy" decoding="async">
+              <div class="doc-card-overlay"></div>
+              <div class="doc-card-content">
+                <h3 class="doc-card-title">Deteksi Titik Api Real-Time</h3>
+                <p class="doc-card-desc">Pengawasan spasial resolusi tinggi untuk mendeteksi anomali suhu dan pembukaan
+                  tutupan tajuk pohon secara seketika dari orbit.</p>
+              </div>
+            </div>
+
+            <!-- Card 6: Reboisasi & Pembibitan Pohon Endemik -->
+            <div class="doc-card" data-index="5">
+              <!-- HK-PATCH: Tambah loading="lazy" dan decoding="async" -->
+              <img src="assets/images/Penanaman Pohon Endemik.webp" alt="Restorasi dan Reboisasi Pohon"
+                class="doc-card-img" loading="lazy" decoding="async">
+              <div class="doc-card-overlay"></div>
+              <div class="doc-card-content">
+                <h3 class="doc-card-title">Penanaman Pohon Endemik</h3>
+                <p class="doc-card-desc">Penanaman kembali bibit Meranti dan Ulin purba di lahan bekas kebakaran untuk
+                  memulihkan daya serap karbon alami.</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Indikator Dots -->
+        <div class="doc-carousel-dots" id="docCarouselDots"></div>
+
+      </div>
+    </section>
+
+    <!-- ======================================================================
+       UNIFIED WRAPPER: PETA TITIK API & CTA (BACKGROUND BERKELANJUTAN)
+       Menggunakan 'assets/images/bg-titik-cta.webp' secara utuh dari titik sampai CTA
+       ====================================================================== -->
+    <div class="unified-hotspot-cta-wrapper" id="area-titik-dan-cta">
+      <div class="unified-bg-overlay"></div>
+
+      <!-- ======================================================================
+         SLIDE 5: PETA TITIK API INTERAKTIF & KONTAK CEPAT (SEAMLESS PURE DARK)
+         Mengikuti gaya desain referensi (Peta Gelap Menyatu + Floating Bar + 4 Kolom Kontak)
+         ====================================================================== -->
+      <section class="hotspot-map-section" id="peta-titik-api">
+        <div class="map-inner-container">
+
+          <!-- Header Simple & Bersih (SVG Icons Murni, No Emojis) -->
+          <div class="simple-map-header">
+            <div class="section-tag-pill pill-alert">
+              <span class="live-pulse-dot"></span>
+              <!-- HK-PATCH: Ubah label klaim real-time menjadi jujur sesuai sumber snapshot NASA FIRMS -->
+              <span id="hotspotSourceBadgeText">Snapshot 1–2 November 2026, sumber NASA FIRMS</span>
+            </div>
+            <h2 class="simple-map-title">
+              Sebaran Titik Panas &amp; <span class="title-accent-gradient">Bara Api Hutan</span>
+            </h2>
+            <p class="simple-map-desc">
+              Sensor satelit mendeteksi koordinat suhu ekstrem dan bara gambut aktif di seluruh nusantara. Klik titik
+              bara
+              untuk rincian lokasi.
+            </p>
+          </div>
+        </div>
+
+        <!-- STAGE PETA MENYATU PENUH (DARI TEKS DESKRIPSI SAMPAI KONTAK TANPA PEMBATAS) -->
+        <div class="seamless-map-stage" id="seamlessMapStage">
+          <!-- Canvas Peta Satelit di Belakang (Full Bleed Mentok Kiri dan Kanan, Masking Halus Alami) -->
+          <div id="hotspotLeafletMap" class="seamless-map-canvas"></div>
+
+          <!-- Layer Konten Interaktif di Atas Peta (Floating Controls + Spacer + Contacts) -->
+          <div class="stage-interactive-overlay">
+            <div class="map-inner-container">
+
+              <!-- Floating Pill Bar Filter (Sesuai Gaya Desain Referensi) -->
+              <div class="map-floating-capsule-bar">
+                <!-- 1. Wilayah Klaster -->
+                <div class="floating-capsule-item" id="filterCapsuleRegion" title="Pilih Wilayah Klaster">
+                  <span class="capsule-sub-label">LOKASI KLASTER</span>
+                  <div class="capsule-val-wrap">
+                    <span class="capsule-val-text" id="floatingRegionVal">Semua Wilayah (150)</span>
+                    <svg class="capsule-chevron" viewBox="0 0 24 24" width="13" height="13" fill="none"
+                      stroke="currentColor" stroke-width="2.5">
+                      <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                  </div>
+
+                  <!-- Dropdown Menu Wilayah -->
+                  <div class="capsule-dropdown-menu" id="dropdownRegionMenu" aria-hidden="true">
+                    <div class="dropdown-item active" data-region="all">
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                      </svg>
+                      <span>Semua Wilayah (<span id="regCountAll">150</span>)</span>
+                    </div>
+                    <div class="dropdown-item" data-region="sumatra">
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M12 2a8 8 0 0 0-8 8c0 5 8 12 8 12s8-7 8-12a8 8 0 0 0-8-8z"></path>
+                      </svg>
+                      <span>Sumatera — Riau &amp; Jambi (<span id="regCountSumatra">38</span>)</span>
+                    </div>
+                    <div class="dropdown-item" data-region="kalimantan">
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M12 2a8 8 0 0 0-8 8c0 5 8 12 8 12s8-7 8-12a8 8 0 0 0-8-8z"></path>
+                      </svg>
+                      <span>Kalimantan — Kalteng &amp; Kalbar (<span id="regCountKalimantan">52</span>)</span>
+                    </div>
+                    <div class="dropdown-item" data-region="papua">
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M12 2a8 8 0 0 0-8 8c0 5 8 12 8 12s8-7 8-12a8 8 0 0 0-8-8z"></path>
+                      </svg>
+                      <span>Papua &amp; Maluku (<span id="regCountPapua">36</span>)</span>
+                    </div>
+                    <div class="dropdown-item" data-region="jawa">
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M12 2a8 8 0 0 0-8 8c0 5 8 12 8 12s8-7 8-12a8 8 0 0 0-8-8z"></path>
+                      </svg>
+                      <span>Jawa &amp; Nusa Tenggara (<span id="regCountJawa">24</span>)</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="capsule-divider"></div>
+
+                <!-- 2. Status Titik Api -->
+                <div class="floating-capsule-item" id="filterCapsuleStatus" title="Pilih Status Titik Bara Api">
+                  <span class="capsule-sub-label">STATUS TITIK API</span>
+                  <div class="capsule-val-wrap">
+                    <!-- HK-PATCH: Jumlah awal disesuaikan dan tersinkronisasi penuh (86 Kubah Gambut + 64 Kritis Ekstrem = 150) -->
+                    <span class="capsule-val-text" id="floatingStatusVal">Semua Titik (<span
+                        id="simpleCountAll">150</span>)</span>
+                    <svg class="capsule-chevron" viewBox="0 0 24 24" width="13" height="13" fill="none"
+                      stroke="currentColor" stroke-width="2.5">
+                      <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                  </div>
+
+                  <!-- Dropdown Menu Status -->
+                  <div class="capsule-dropdown-menu" id="dropdownStatusMenu" aria-hidden="true">
+                    <div class="dropdown-item active" data-status="all">
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M12 6v6l4 2"></path>
+                      </svg>
+                      <span>Semua Titik (<span id="dropCountAll">150</span>)</span>
+                    </div>
+                    <div class="dropdown-item" data-status="peat">
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path
+                          d="M12 10a6 6 0 0 0-6-6H3v2a6 6 0 0 0 6 6h3zm0 0a6 6 0 0 1 6-6h3v2a6 6 0 0 1-6 6h-3zm0 0v11">
+                        </path>
+                      </svg>
+                      <span>Kubah Gambut (<span id="dropCountPeat">86</span>)</span>
+                    </div>
+                    <div class="dropdown-item" data-status="critical">
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                      </svg>
+                      <span>Kritis Ekstrem (<span id="dropCountCrit">64</span>)</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="capsule-divider"></div>
+
+                <!-- 3. WhatsApp Siaga Posko -->
+                <a href="https://wa.me/6281196201123?text=Halo%20Manggala%20Agni%20KLHK%2C%20saya%20ingin%20melaporkan%20kejadian%20kebakaran%20hutan"
+                  target="_blank" rel="noopener noreferrer" class="floating-capsule-item item-link"
+                  title="Chat WhatsApp Manggala Agni">
+                  <span class="capsule-sub-label">WHATSAPP OFFICIAL</span>
+                  <div class="capsule-val-wrap">
+                    <span class="capsule-val-text green-accent">+62 811-9620-1123</span>
+                  </div>
+                </a>
+
+                <!-- 4. Tombol Search / Reset Bulat Emas -->
+                <button class="capsule-search-btn" id="btnResetMapZoom" type="button"
+                  title="Pusatkan Kembali Peta Indonesia" aria-label="Reset Tampilan Peta">
+                  <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Spacer Ruang Peta Tengah Agar Titik-Titik Api Terlihat Leluasa -->
+            <div class="stage-map-spacer"></div>
+
+            <div class="map-inner-container">
+              <!-- KONTAK LANGSUNG DI BAWAH TITIK PETA (4 KOLOM MINIMALIS ELEGAN SESUAI REFERENSI) -->
+              <div class="reference-hotline-bar" id="kontak-darurat">
+                <!-- Ornamen Motif Watermark Alami di Kiri Bawah (Mirip Referensi Gambar) -->
+                <div class="bar-watermark-ornament" aria-hidden="true">
+                  <svg viewBox="0 0 120 120" width="115" height="115" fill="none" stroke="rgba(52, 211, 153, 0.15)"
+                    stroke-width="1.2">
+                    <path d="M60 10 C30 35, 10 70, 60 110 C110 70, 90 35, 60 10 Z"></path>
+                    <path d="M60 10 L60 110 M35 50 Q60 65 85 50 M25 75 Q60 90 95 75"></path>
+                  </svg>
+                </div>
+
+                <div class="reference-hotline-grid">
+                  <!-- 1. WhatsApp Official -->
+                  <a href="https://wa.me/6281196201123?text=Halo%20Manggala%20Agni%20KLHK%2C%20saya%20ingin%20melaporkan%20kejadian%20kebakaran%20hutan"
+                    target="_blank" rel="noopener noreferrer" class="ref-contact-col"
+                    title="WhatsApp Manggala Agni KLHK (0811-9620-1123)">
+                    <div class="ref-contact-icon">
+                      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                          d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+                        </path>
+                      </svg>
+                    </div>
+                    <span class="ref-contact-label">WHATSAPP OFFICIAL</span>
+                    <span class="ref-contact-val">+62 811-9620-1123</span>
+                  </a>
+
+                  <!-- 2. DAMKAR Indonesia (113) -->
+                  <a href="tel:113" class="ref-contact-col" title="Panggil Damkar 113 Bebas Pulsa">
+                    <div class="ref-contact-icon">
+                      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                      </svg>
+                    </div>
+                    <span class="ref-contact-label">PEMADAM KEBAKARAN</span>
+                    <span class="ref-contact-val">DAMKAR Siaga 113</span>
+                  </a>
+
+                  <!-- 3. Lokasi Pusdalops BPBD (112) -->
+                  <a href="tel:112" class="ref-contact-col" title="Panggil Pusdalops BPBD 112">
+                    <div class="ref-contact-icon">
+                      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                      </svg>
+                    </div>
+                    <span class="ref-contact-label">LOKASI PUSDALOPS</span>
+                    <span class="ref-contact-val">BPBD Bencana 112</span>
+                  </a>
+
+                  <!-- 4. Penegakan Hukum Gakkum & Polri (110) -->
+                  <a href="tel:110" class="ref-contact-col" title="Panggil Penegakan Hukum LHK & Polri 110">
+                    <div class="ref-contact-icon">
+                      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                      </svg>
+                    </div>
+                    <span class="ref-contact-label">PENEGAKAN HUKUM</span>
+                    <span class="ref-contact-val">Gakkum &amp; Polri 110</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================================
+         SLIDE 6: CTA AJAKAN MENJAGA HUTAN DENGAN FRAME VIDEO
+         Sisi Kiri: Tulisan Ajakan & Button Ikrar/Bagikan | Sisi Kanan: Frame Video
+         ====================================================================== -->
+      <section class="forest-cta-section" id="ajakan-jaga-hutan">
+        <div class="cta-inner-container">
+
+          <div class="cta-layout-grid">
+            <!-- Sisi Kiri: Judul, Tulisan Ajakan & Button -->
+            <div class="cta-content-col">
+              <div class="section-tag-pill pill-nature">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 10a6 6 0 0 0-6-6H3v2a6 6 0 0 0 6 6h3zm0 0a6 6 0 0 1 6-6h3v2a6 6 0 0 1-6 6h-3zm0 0v11">
+                  </path>
+                </svg>
+                <span>Gerakan Pelestarian Rimba Nusantara</span>
+              </div>
+
+              <h2 class="cta-title">
+                Mari Jaga Rimba Kita, Demi <span class="title-accent">Masa Depan Bumi</span>
+              </h2>
+
+              <p class="cta-desc">
+                Hutan hujan tropis Indonesia adalah benteng pertahanan iklim dunia dan rumah bagi puluhan ribu spesies
+                purba. Masa depan paru-paru bumi ditentukan oleh kepedulian yang kita wujudkan bersama. Ambil peran
+                nyata
+                hari ini: ikrarkan komitmen pelestarianmu dan bagikan inspirasi ini ke seluruh penjuru negeri.
+              </p>
+
+              <!-- Button Ikrar dan Bagikan -->
+              <div class="cta-button-group">
+                <button class="btn-cta-primary" id="btnPledgeForest" type="button">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path
+                      d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+                    </path>
+                  </svg>
+                  <span>Ikrar Jaga Rimba</span>
+                </button>
+
+                <button class="btn-cta-secondary" id="btnShareCampaign" type="button">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="18" cy="5" r="3"></circle>
+                    <circle cx="6" cy="12" r="3"></circle>
+                    <circle cx="18" cy="19" r="3"></circle>
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                  </svg>
+                  <span>Bagikan Aksi</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Sisi Kanan: Frame Video -->
+            <div class="cta-video-col">
+              <div class="cta-video-frame">
+                <video class="cta-video-player" controls autoplay muted loop playsinline
+                  poster="assets/images/satelit-drone.webp">
+                  <source src="assets/videos/footer-video.mp4" type="video/mp4">
+                  Browser Anda tidak mendukung pemutar video.
+                </video>
+                <div class="video-frame-badge">
+                  <span class="live-pulse-dot"></span>
+                  <span>Dokumenter Rimba Tropis</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+  <!-- /HK-PATCH: Akhir pembungkus utama konten halaman -->
+
+  <!-- ======================================================================
+       FOOTER UTAMA & COPYRIGHT
+       ====================================================================== -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-top-grid">
+
+        <!-- Column 1: Brand & Mission -->
+        <div class="footer-col col-brand">
+          <div class="footer-brand">
+            <span class="brand-text">HutanKita<span class="dot">.</span></span>
+          </div>
+          <p class="footer-tagline">
+            Platform edukasi sains botani, visualisasi 3D anatomi pohon, investigasi ancaman perusakan alam, serta
+            pemantauan
+            terpadu kebakaran hutan tropis nusantara.
+          </p>
+          <div class="footer-partner-logos">
+            <img src="assets/images/logo-technoversary.webp"
+              alt="Logo Universitas Kuningan, FKOM, Teknik Informatika, HMTI, dan Techno Versary Vol. II"
+              class="footer-partner-logos-img" width="983" height="149" loading="lazy" decoding="async">
+          </div>
+
+        </div>
+
+        <!-- Column 2: Navigasi Cepat -->
+        <div class="footer-col col-links">
+          <h3 class="footer-col-title">Navigasi Halaman</h3>
+          <ul class="footer-nav-list">
+            <li><a href="#hero">Beranda Utama</a></li>
+            <li><a href="#edukasi">Anatomi Pohon &amp; Botani 3D</a></li>
+            <li><a href="#perusakan-hutan">Krisis Perusakan Hutan</a></li>
+            <li><a href="#galeri-hutan">Galeri Rekaman Aksi</a></li>
+            <li><a href="#peta-titik-api">Peta Hotspot Satelit</a></li>
+            <li><a href="#kontak-darurat">Kontak Posko Darurat</a></li>
+          </ul>
+        </div>
+
+        <!-- Column 3: Pusat Darurat Karhutla -->
+        <div class="footer-col col-emergency">
+          <h3 class="footer-col-title">Layanan Siaga Karhutla</h3>
+          <ul class="footer-emergency-list">
+            <li><strong>Damkar Nasional:</strong> <a href="tel:113">113 / 112</a></li>
+            <li><strong>Manggala Agni:</strong> <a href="tel:081196201123">0811-9620-1123</a></li>
+            <li><strong>BPBD Pusdalops:</strong> <a href="tel:112">112 (Bebas Pulsa)</a></li>
+            <li><strong>Polisi Gakkum:</strong> <a href="tel:110">110 (Pengaduan Pidana)</a></li>
+            <li><strong>Medis &amp; ISPA:</strong> <a href="tel:119">119 (Darurat Ambulans)</a></li>
+          </ul>
+        </div>
+
+        <!-- Column 4: Sumber Data & Referensi -->
+        <div class="footer-col col-sources">
+          <h3 class="footer-col-title">Sumber Data &amp; Kemitraan</h3>
+          <ul class="footer-sources-list">
+            <li>Kementerian Lingkungan Hidup &amp; Kehutanan (Sipongi+)</li>
+            <li>NASA Earthdata (FIRMS Active Fire System)</li>
+            <li>Badan Meteorologi, Klimatologi, dan Geofisika (BMKG)</li>
+            <li>Badan Nasional Penanggulangan Bencana (BNPB)</li>
+            <li>Global Forest Watch (GFW)</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Footer Bottom Divider & Copyright -->
+      <div class="footer-bottom-bar">
+        <div class="footer-copy">
+          &copy; 2026 <strong>HutanKita Indonesia</strong> &bull; Didedikasikan untuk Pelestarian Rimba Tropis &amp;
+          Perlindungan Paru-Paru Dunia.
+        </div>
+        <button class="footer-back-to-top" id="btnBackToTop" type="button" aria-label="Kembali ke atas">
+          <span>Kembali ke Atas</span>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="18 15 12 9 6 15"></polyline>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ======================================================================
+       MODAL POP-UP DETAIL INFORMASI & FOTO KARTU (GALLERY & ANCAMAN)
+       ====================================================================== -->
+  <div class="site-modal-overlay" id="cardDetailModal" aria-hidden="true" role="dialog">
+    <div class="site-modal-dialog">
+      <button class="modal-close-btn" id="btnCloseCardModal" type="button" aria-label="Tutup Detail">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+      <div class="modal-photo-wrap">
+        <!-- HK-PATCH: Tambah loading="lazy" dan decoding="async" -->
+        <img src="assets/images/bg-hero-slide2.webp" alt="Detail Foto" class="modal-photo-img" id="modalCardImg"
+          loading="lazy" decoding="async">
+        <div class="modal-photo-gradient"></div>
+        <span class="modal-photo-tag" id="modalCardTag">Dokumentasi</span>
+      </div>
+      <div class="modal-body-content">
+        <h3 class="modal-card-title" id="modalCardTitle">Judul Dokumentasi</h3>
+        <p class="modal-card-desc" id="modalCardDesc">Deskripsi rincian dokumentasi konservasi hutan tropis Indonesia.
+        </p>
+        <div class="modal-extra-info" id="modalCardExtra"></div>
+        <div class="modal-footer-actions">
+          <button class="btn-modal-dismiss" id="btnDismissCardModal" type="button">
+            <span>Tutup Jendela</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       MODAL POP-UP DIREKTORI NOMOR KONTAK DARURAT LENGKAP (TANPA EMOTIKON)
+       ====================================================================== -->
+  <div class="site-modal-overlay" id="hotlineQuickModal" aria-hidden="true" role="dialog">
+    <div class="site-modal-dialog modal-hotlines">
+      <button class="modal-close-btn" id="btnCloseHotlineModal" type="button" aria-label="Tutup Kontak">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+      <div class="modal-hotline-header">
+        <div class="section-tag-pill pill-alert">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path
+              d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+            </path>
+          </svg>
+          <span>Pusat Tanggap Darurat 24 Jam</span>
+        </div>
+        <h3 class="modal-hotline-title">Layanan Siaga Karhutla Nasional</h3>
+        <p class="modal-hotline-desc">Gunakan nomor siaga di bawah ini untuk melaporkan kobaran api, kabut asap, atau
+          penebangan liar:</p>
+      </div>
+
+      <div class="modal-hotline-list">
+        <!-- 1. DAMKAR -->
+        <div class="modal-hotline-row">
+          <div class="hotline-row-info">
+            <span class="hotline-row-name">Pemadam Kebakaran (DAMKAR)</span>
+            <span class="hotline-row-number">113 / 112</span>
+            <span class="hotline-row-duty">Pemadaman api darurat pemukiman &amp; areal lahan</span>
+          </div>
+          <div class="hotline-row-actions">
+            <a href="tel:113" class="btn-row-call">Panggil 113</a>
+            <button class="btn-row-copy" onclick="window.copyToClipboard('113', 'Nomor DAMKAR 113 disalin!')"
+              type="button">Salin</button>
+          </div>
+        </div>
+
+        <!-- 2. Manggala Agni -->
+        <div class="modal-hotline-row">
+          <div class="hotline-row-info">
+            <span class="hotline-row-name">Manggala Agni (KLHK)</span>
+            <span class="hotline-row-number">0811-9620-1123</span>
+            <span class="hotline-row-duty">Satuan khusus pemadam bara gambut bawah tanah</span>
+          </div>
+          <div class="hotline-row-actions">
+            <a href="https://wa.me/6281196201123?text=Halo%20Manggala%20Agni%2C%20saya%20ingin%20lapor%20karhutla"
+              target="_blank" rel="noopener noreferrer" class="btn-row-wa">WhatsApp</a>
+            <a href="tel:081196201123" class="btn-row-call">Telepon</a>
+          </div>
+        </div>
+
+        <!-- 3. BPBD -->
+        <div class="modal-hotline-row">
+          <div class="hotline-row-info">
+            <span class="hotline-row-name">BPBD Pusdalops Bencana</span>
+            <span class="hotline-row-number">112 / (021) 2982-7799</span>
+            <span class="hotline-row-duty">Layanan bebas pulsa darurat bencana &amp; kabut asap</span>
+          </div>
+          <div class="hotline-row-actions">
+            <a href="tel:112" class="btn-row-call">Panggil 112</a>
+            <button class="btn-row-copy" onclick="window.copyToClipboard('112', 'Nomor BPBD 112 disalin!')"
+              type="button">Salin</button>
+          </div>
+        </div>
+
+        <!-- 4. Polri & Gakkum -->
+        <div class="modal-hotline-row">
+          <div class="hotline-row-info">
+            <span class="hotline-row-name">Polri &amp; Gakkum KLHK</span>
+            <span class="hotline-row-number">110 / 0811-960-3112</span>
+            <span class="hotline-row-duty">Pengaduan hukum pembakar hutan liar &amp; pembalakan</span>
+          </div>
+          <div class="hotline-row-actions">
+            <a href="tel:110" class="btn-row-call">Panggil 110</a>
+            <button class="btn-row-copy" onclick="window.copyToClipboard('110', 'Nomor Polri 110 disalin!')"
+              type="button">Salin</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       HK-PATCH: POP-UP KUIS EDUKASI RIMBA 15 SOAL & SERTIFIKAT NILAI (<dialog id="hkQuizDialog">)
+       Dibuka dari tombol di area Anatomi (#btnOpenQuizModal & #btnOpenQuizFromDetail).
+       ====================================================================== -->
+  <dialog class="hk-pledge-dialog hk-quiz-dialog" id="hkQuizDialog" aria-labelledby="hkQuizDialogTitle">
+    <div class="hk-pledge-dialog-inner">
+      <div class="hk-pledge-dialog-header">
+        <h3 class="hk-subtitle" id="hkQuizDialogTitle">Kuis Edukasi Rimba Nusantara (15 Soal)</h3>
+        <button type="button" class="hk-dialog-close" id="hkQuizCloseTopBtn" aria-label="Tutup jendela kuis">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <p class="hk-text">
+        Uji pemahaman Anda melalui 15 pertanyaan yang bersumber langsung dari materi anatomi pohon 3D, ancaman
+        deforestasi, pasal undang-undang kehutanan, galeri konservasi, serta pemantauan satelit di halaman HutanKita.
+        Selesaikan seluruh soal untuk mengunduh Sertifikat &amp; Badge Kelulusan Resmi.
+      </p>
+
+      <div class="hk-quiz-container" id="hkQuizContainer">
+        <!-- Area Soal Aktif -->
+        <div id="hkQuizActiveArea" class="hk-quiz-active-area">
+          <div class="hk-quiz-top">
+            <span class="hk-quiz-progress" id="hkQuizProgress">Soal 1 dari 15</span>
+            <span class="hk-quiz-topic" id="hkQuizTopic">Topik: Anatomi Pohon</span>
+          </div>
+
+          <h4 class="hk-quiz-question" id="hkQuizQuestion">
+            Memuat pertanyaan kuis...
+          </h4>
+
+          <div class="hk-quiz-options" id="hkQuizOptions" role="group" aria-labelledby="hkQuizQuestion">
+            <!-- Tombol pilihan jawaban dirender secara dinamis oleh js/tambahan.js -->
+          </div>
+
+          <div class="hk-quiz-feedback" id="hkQuizFeedback" role="status" aria-live="polite" hidden>
+            <p class="hk-quiz-feedback-status" id="hkQuizFeedbackStatus"></p>
+            <p class="hk-quiz-feedback-text" id="hkQuizFeedbackText"></p>
+          </div>
+
+          <div class="hk-quiz-actions">
+            <button type="button" class="btn-cta-primary" id="hkQuizNextBtn" hidden>
+              <span id="hkQuizNextLabel">Soal berikutnya</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Area Ringkasan Nilai & Sertifikat Kelulusan Kuis -->
+        <div class="hk-quiz-summary" id="hkQuizSummary" role="region" aria-live="polite"
+          aria-label="Hasil akhir kuis dan sertifikat" hidden>
+          <div class="hk-quiz-score-banner">
+            <h4 class="hk-subtitle" id="hkQuizScoreTitle">Ringkasan Hasil Kuis</h4>
+            <p class="hk-text" id="hkQuizScoreDesc"></p>
+          </div>
+
+          <div class="hk-quiz-cert-section">
+            <div class="hk-form-field">
+              <label for="hkQuizCertName" class="hk-form-label">Nama lengkap pada Sertifikat Nilai</label>
+              <input type="text" id="hkQuizCertName" class="hk-input" maxlength="48"
+                placeholder="Ketik nama lengkap Anda untuk dicetak pada sertifikat" autocomplete="name">
+            </div>
+
+            <div class="hk-cert-preview-box">
+              <span class="hk-form-label">Pratinjau Sertifikat &amp; Badge Kelulusan Kuis (1400x1000 px)</span>
+              <canvas id="hkQuizCertCanvas" class="hk-cert-canvas" width="1400" height="1000"
+                aria-label="Pratinjau sertifikat nilai kuis HutanKita"></canvas>
+            </div>
+
+            <div class="hk-quiz-summary-actions">
+              <button type="button" class="btn-cta-primary" id="hkQuizDownloadCertBtn">
+                <span>Unduh Sertifikat Nilai (PNG)</span>
+              </button>
+              <button type="button" class="btn-cta-secondary" id="hkQuizRestartBtn">
+                <span>Ulangi Kuis (15 Soal)</span>
+              </button>
+              <button type="button" class="btn-cta-secondary" id="hkQuizCloseBottomBtn">
+                <span>Tutup Jendela</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ======================================================================
+       HK-PATCH: DIALOG SERTIFIKAT & BADGE IKRAR PELESTARIAN HUTAN (<dialog id="hkPledgeDialog">)
+       Dibuka melalui listener tambahan pada tombol #btnPledgeForest tanpa menghapus handler lama.
+       ====================================================================== -->
+  <dialog class="hk-pledge-dialog" id="hkPledgeDialog" aria-labelledby="hkPledgeDialogTitle">
+    <div class="hk-pledge-dialog-inner">
+      <div class="hk-pledge-dialog-header">
+        <h3 class="hk-subtitle" id="hkPledgeDialogTitle">Sertifikat &amp; Badge Ikrar Pelestarian Hutan</h3>
+        <button type="button" class="hk-dialog-close" id="hkPledgeCloseTopBtn"
+          aria-label="Tutup dialog sertifikat ikrar">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <p class="hk-text">
+        Isi nama lengkap Anda dan pilih satu komitmen pelestarian. Sertifikat &amp; Badge resmi bertanda tangan Founder
+        HutanKita akan dibuat secara otomatis dan siap diunduh dalam resolusi tinggi (1400x1000 piksel).
+      </p>
+
+      <div class="hk-pledge-layout">
+        <form class="hk-pledge-form" id="hkPledgeForm" onsubmit="return false;">
+          <div class="hk-form-field">
+            <label for="hkPledgeName" class="hk-form-label">Nama Lengkap Penerima Sertifikat</label>
+            <input type="text" id="hkPledgeName" class="hk-input" maxlength="48"
+              placeholder="Tulis nama lengkap Anda untuk sertifikat ikrar" autocomplete="name">
+          </div>
+
+          <fieldset class="hk-pledge-fieldset">
+            <legend class="hk-form-label">Pilih satu komitmen pelestarian rimba</legend>
+            <div class="hk-pledge-choices" id="hkPledgeChoices">
+              <label class="hk-pledge-choice">
+                <input type="radio" name="hkPledgeOption"
+                  value="Tidak membuka lahan dengan membakar serta tidak membuang bara api di area vegetasi kering."
+                  checked>
+                <span>Tidak membuka lahan dengan membakar serta tidak membuang bara api di area vegetasi kering.</span>
+              </label>
+              <label class="hk-pledge-choice">
+                <input type="radio" name="hkPledgeOption"
+                  value="Menghemat pemakaian kertas dan memilih produk hasil hutan yang bersertifikat lestari.">
+                <span>Menghemat pemakaian kertas dan memilih produk hasil hutan yang bersertifikat lestari.</span>
+              </label>
+              <label class="hk-pledge-choice">
+                <input type="radio" name="hkPledgeOption"
+                  value="Melaporkan temuan titik api, kabut asap, atau penebangan liar ke posko darurat kehutanan.">
+                <span>Melaporkan temuan titik api, kabut asap, atau penebangan liar ke posko darurat kehutanan.</span>
+              </label>
+              <label class="hk-pledge-choice">
+                <input type="radio" name="hkPledgeOption"
+                  value="Menanam dan merawat pohon lokal di lingkungan sekitar untuk menjaga resapan air dan cadangan karbon.">
+                <span>Menanam dan merawat pohon lokal di lingkungan sekitar untuk menjaga resapan air dan cadangan
+                  karbon.</span>
+              </label>
+              <label class="hk-pledge-choice">
+                <input type="radio" name="hkPledgeOption"
+                  value="Membagikan pengetahuan tentang fungsi hutan hujan tropis dan lahan gambut kepada keluarga serta teman.">
+                <span>Membagikan pengetahuan tentang fungsi hutan hujan tropis dan lahan gambut kepada keluarga serta
+                  teman.</span>
+              </label>
+            </div>
+          </fieldset>
+
+          <p class="hk-pledge-saved-note" id="hkPledgeSavedNote" role="status" aria-live="polite">
+            Perubahan disimpan otomatis di peramban perangkat ini.
+          </p>
+
+          <div class="hk-pledge-actions">
+            <button type="button" class="btn-cta-primary" id="hkPledgeDownloadBtn">
+              <span>Unduh Sertifikat Ikrar (PNG)</span>
+            </button>
+            <button type="button" class="btn-cta-secondary" id="hkPledgeCloseBtn">
+              <span>Tutup Dialog</span>
+            </button>
+          </div>
+        </form>
+
+        <div class="hk-pledge-preview-wrap">
+          <span class="hk-form-label">Pratinjau Sertifikat &amp; Badge Ikrar (1400x1000 px)</span>
+          <canvas id="hkPledgeCanvas" class="hk-cert-canvas" width="1400" height="1000"
+            aria-label="Pratinjau sertifikat ikrar pelestarian hutan"></canvas>
+        </div>
+      </div>
+    </div>
+  </dialog>
+  <!-- /HK-PATCH -->
+
+  <!-- Floating WhatsApp Quick Action Button (Fixed di Kanan Bawah Layar Desktop & Mobile) -->
+  <a href="https://wa.me/6281196201123?text=Halo%20Manggala%20Agni%20KLHK%2C%20saya%20ingin%20melaporkan%20kebakaran%20hutan"
+    target="_blank" rel="noopener noreferrer" class="ref-floating-wa-btn" title="Chat WhatsApp Manggala Agni"
+    aria-label="WhatsApp Posko">
+    <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
+      <path
+        d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z" />
+    </svg>
+  </a>
+
+  <!-- ======================================================================
+       NAVIGASI APLIKASI MOBILE (APP-STYLE BOTTOM NAVIGATION BAR)
+       ====================================================================== -->
+  <nav class="mobile-bottom-app-bar" id="mobileBottomAppBar" aria-label="Navigasi Bawah Aplikasi">
+    <a href="#hero" class="app-nav-item active" data-nav="hero">
+      <div class="app-nav-icon">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+      </div>
+      <span class="app-nav-text">Beranda</span>
+    </a>
+    <a href="#edukasi" class="app-nav-item" data-nav="edukasi">
+      <div class="app-nav-icon">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22v-9"></path>
+          <path d="M8 13a4 4 0 1 1 8 0c0 2-2 3-4 4-2-1-4-2-4-4z"></path>
+          <path d="M4 17a8 8 0 0 1 16 0"></path>
+        </svg>
+      </div>
+      <span class="app-nav-text">Anatomi</span>
+    </a>
+    <a href="#perusakan-hutan" class="app-nav-item" data-nav="perusakan-hutan">
+      <div class="app-nav-icon">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+      </div>
+      <span class="app-nav-text">Krisis</span>
+    </a>
+    <a href="#galeri-hutan" class="app-nav-item" data-nav="galeri-hutan">
+      <div class="app-nav-icon">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+          <circle cx="8.5" cy="8.5" r="1.5"></circle>
+          <polyline points="21 15 16 10 5 21"></polyline>
+        </svg>
+      </div>
+      <span class="app-nav-text">Galeri</span>
+    </a>
+    <a href="#peta-titik-api" class="app-nav-item" data-nav="peta-titik-api">
+      <div class="app-nav-icon">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path
+            d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z">
+          </path>
+        </svg>
+      </div>
+      <span class="app-nav-text">Titik Api</span>
+    </a>
+  </nav>
+
+  <!-- Toast Notification Container -->
+  <div class="site-toast" id="siteToast"></div>
+
+  <!-- HK-PATCH: Data 150 titik panas tersinkronisasi dimuat sebelum script utama -->
+  <script src="js/firms-hotspots-data.js" defer></script>
+  <script src="js/script.js" defer></script>
+  <!-- HK-PATCH: Script tambahan untuk audio video, pop-up kuis 15 soal, dan 2 sertifikat resmi -->
+  <script src="js/tambahan.js" defer></script>
+</body>
+
+</html>
