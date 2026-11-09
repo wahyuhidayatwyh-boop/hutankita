@@ -116,7 +116,7 @@ Setelah perintah berjalan, buka peramban dan kunjungi alamat `http://localhost:8
 
 ### c. Melalui GitHub Pages
 Website dapat diakses secara daring melalui tautan berikut:
-- **Link GitHub Pages:** `[ISI SETELAH PAGES AKTIF]`
+- **Link GitHub Pages:** https://wahyuhidayatwyh-boop.github.io/hutankita/
 
 ## Catatan Sumber Data Peta
 
@@ -203,5 +203,5 @@ Hasil pengujian menggunakan Google Lighthouse 13.5.0 melalui server lokal (`http
 - **Email:** wahyuhidayat.wyh@gmail.com
 - **Instagram:** @whyuhdyat___ (https://instagram.com/whyuhdyat___)
 - **Repo GitHub:** https://github.com/wahyuhidayatwyh-boop/hutankita
-- **Link GitHub Pages:** [ISI SETELAH PAGES AKTIF]
+- **Link GitHub Pages:** https://wahyuhidayatwyh-boop.github.io/hutankita/
 
