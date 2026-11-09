@@ -145,6 +145,17 @@ function initHkVideoAudioFix() {
   const isLocalSimpleServer =
     window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
 
+  function ensureCtaVideoSourceLoaded() {
+    if (!ctaVideo || ctaVideo._hkSourceAttached) return;
+    const srcEl = ctaVideo.querySelector("source[data-src]");
+    if (srcEl && !srcEl.getAttribute("src")) {
+      srcEl.setAttribute("src", srcEl.getAttribute("data-src"));
+      ctaVideo.setAttribute("preload", "metadata");
+      ctaVideo.load();
+    }
+    ctaVideo._hkSourceAttached = true;
+  }
+
   // Prioritaskan bandwidth 100% untuk Hero Video saat halaman pertama kali dibuka:
   // Jeda sementara video di bagian bawah halaman (CTA/Footer) sampai pengguna menggulir mendekatinya
   if (heroVideo) {
@@ -178,6 +189,7 @@ function initHkVideoAudioFix() {
         (entries) => {
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
+              ensureCtaVideoSourceLoaded();
               if (ctaVideo.paused) {
                 const p = ctaVideo.play();
                 if (p && typeof p.catch === "function") p.catch(() => {});
@@ -187,14 +199,19 @@ function initHkVideoAudioFix() {
             }
           });
         },
-        { rootMargin: "350px 0px" }
+        { rootMargin: "600px 0px" }
       );
       ctaVidObserver.observe(ctaVideo);
     }
+  } else if (ctaVideo) {
+    ensureCtaVideoSourceLoaded();
   }
 
   function ensurePlayingWithAudio(videoEl, fallbackSrc) {
     if (!videoEl) return;
+    if (videoEl === ctaVideo) {
+      ensureCtaVideoSourceLoaded();
+    }
     videoEl.volume = 1.0;
 
     if (!videoEl.muted) {

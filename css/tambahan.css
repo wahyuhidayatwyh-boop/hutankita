@@ -171,6 +171,73 @@ summary:focus-visible,
   -webkit-backface-visibility: hidden;
 }
 
+/* Responsif Dropdown Titik Api & Popup Marker di Mobile agar Tidak Pernah Keluar Layar */
+@media (max-width: 768px) {
+  .map-floating-capsule-bar {
+    position: relative !important;
+    width: min(92vw, 360px) !important;
+    max-width: calc(100vw - 1.5rem) !important;
+    box-sizing: border-box !important;
+  }
+
+  .floating-capsule-item {
+    position: static !important;
+    flex: 1 1 0% !important;
+    min-width: 0 !important;
+    padding: 0.18rem 0.35rem !important;
+  }
+
+  .capsule-val-wrap {
+    width: 100% !important;
+    min-width: 0 !important;
+    justify-content: space-between !important;
+    gap: 0.25rem !important;
+  }
+
+  .capsule-val-text {
+    font-size: 0.74rem !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    min-width: 0 !important;
+  }
+
+  .capsule-dropdown-menu {
+    position: absolute !important;
+    top: calc(100% + 8px) !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: calc(100vw - 1.5rem) !important;
+    box-sizing: border-box !important;
+    transform: translateY(-8px) !important;
+    padding: 0.4rem !important;
+  }
+
+  .capsule-dropdown-menu.show {
+    transform: translateY(0) !important;
+  }
+
+  .capsule-dropdown-menu .dropdown-item {
+    white-space: normal !important;
+    font-size: 0.78rem !important;
+    padding: 0.52rem 0.7rem !important;
+    line-height: 1.32 !important;
+  }
+
+  .custom-seamless-popup .leaflet-popup-content {
+    margin: 0 !important;
+    max-width: min(260px, 80vw) !important;
+  }
+
+  .simple-hotspot-bubble {
+    min-width: 200px !important;
+    max-width: min(260px, 80vw) !important;
+    padding: 0.85rem 0.95rem !important;
+  }
+}
+
 /* ==========================================================================
    TOMBOL PEMICU POP-UP KUIS DI AREA ANATOMI POHON (#anatomi-pohon)
    ========================================================================== */

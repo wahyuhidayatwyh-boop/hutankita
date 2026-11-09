@@ -74,7 +74,8 @@
   <section class="hero-fullscreen" id="hero">
 
     <!-- Background Video Cover -->
-    <video class="hero-video" autoplay muted loop playsinline>
+    <video class="hero-video" autoplay muted loop playsinline preload="auto" fetchpriority="high"
+      poster="assets/images/bg-hero-slide2.webp">
       <source src="assets/videos/hero-video.mp4" type="video/mp4">
       Your browser does not support the video tag.
     </video>
@@ -282,13 +283,13 @@
             <div class="map-view-layer map-3d-view active" id="view3DLayer">
               <canvas id="indonesia3DCanvas" class="three-canvas"></canvas>
               <img src="assets/images/peta.webp" alt="Peta Indonesia 3D Relief" class="map-fallback-img"
-                id="mapFallbackImg">
+                id="mapFallbackImg" loading="lazy" decoding="async">
             </div>
 
             <!-- Layer 2: Peta Penjelasan Data (assets/images/peta-penjelasan.webp) -->
             <div class="map-view-layer map-explanation-view" id="viewExplanationLayer">
               <img src="assets/images/peta-penjelasan.webp" alt="Peta Penjelasan Hutan Indonesia"
-                class="explanation-map-img" id="imgExplanation">
+                class="explanation-map-img" id="imgExplanation" loading="lazy" decoding="async">
             </div>
 
             <!-- Floating Interactive Switcher & Hint (Tanpa Card) -->
@@ -334,7 +335,7 @@
             <div class="map-view-layer active" id="tree3DLayer">
               <canvas id="tree3DCanvas" class="three-canvas"></canvas>
               <img src="assets/images/pohon-3d.webp" alt="Pohon Hutan Tropis 3D Utuh" class="tree-fallback-img"
-                id="treeFallbackImg">
+                id="treeFallbackImg" loading="lazy" decoding="async">
             </div>
 
             <!-- Titik Hotspot Interaktif pada Bagian Pohon -->
@@ -424,11 +425,11 @@
             <div class="detail-photos-row">
               <div class="detail-photo-frame photo-main">
                 <img src="assets/images/akar1.webp" alt="Foto Utama Lapisan Anatomi" class="detail-layer-img"
-                  id="detailImgMain">
+                  id="detailImgMain" loading="lazy" decoding="async">
               </div>
               <div class="detail-photo-frame photo-secondary">
                 <img src="assets/images/akar2.webp" alt="Foto Tambahan Lapisan Anatomi" class="detail-layer-img"
-                  id="detailImgSecondary">
+                  id="detailImgSecondary" loading="lazy" decoding="async">
               </div>
             </div>
 
@@ -1173,9 +1174,9 @@
             <!-- Sisi Kanan: Frame Video -->
             <div class="cta-video-col">
               <div class="cta-video-frame">
-                <video class="cta-video-player" controls autoplay muted loop playsinline
+                <video class="cta-video-player" controls muted loop playsinline preload="none"
                   poster="assets/images/satelit-drone.webp">
-                  <source src="assets/videos/footer-video.mp4" type="video/mp4">
+                  <source data-src="assets/videos/footer-video.mp4" type="video/mp4">
                   Browser Anda tidak mendukung pemutar video.
                 </video>
                 <div class="video-frame-badge">
