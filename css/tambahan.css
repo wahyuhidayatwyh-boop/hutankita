@@ -153,6 +153,24 @@ summary:focus-visible,
   }
 }
 
+/* Optimasi Performa Hero Video & Slider Galeri di Mobile & Desktop */
+.hero-video {
+  background: url('../assets/images/bg-hero-slide2.webp') center center / cover no-repeat;
+  background-color: #050b07;
+}
+
+.doc-carousel-viewport {
+  touch-action: pan-y pinch-zoom;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.doc-carousel-track {
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
 /* ==========================================================================
    TOMBOL PEMICU POP-UP KUIS DI AREA ANATOMI POHON (#anatomi-pohon)
    ========================================================================== */

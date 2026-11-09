@@ -607,7 +607,7 @@ document.addEventListener("DOMContentLoaded", () => {
         powerPreference: "high-performance",
       });
       renderer.setSize(container.clientWidth, container.clientHeight);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, window.innerWidth <= 768 ? 1.35 : 2));
 
       // Pencahayaan Realistis
       const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
@@ -809,11 +809,25 @@ document.addEventListener("DOMContentLoaded", () => {
         renderer.setSize(container.clientWidth, container.clientHeight);
       });
 
-      // Animasi Loop
+      // Animasi Loop (Hemat GPU: hanya merender ketika area peta terlihat di layar)
       let clock = new THREE.Clock();
+      let isMapInViewport = true;
+
+      if ("IntersectionObserver" in window && container) {
+        const mapVisObserver = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              isMapInViewport = entry.isIntersecting;
+            });
+          },
+          { rootMargin: "150px 0px" }
+        );
+        mapVisObserver.observe(container);
+      }
 
       function animate() {
         requestAnimationFrame(animate);
+        if (!isMapInViewport || document.hidden) return;
 
         const elapsedTime = clock.getElapsedTime();
 
@@ -1065,7 +1079,7 @@ document.addEventListener("DOMContentLoaded", () => {
         powerPreference: "high-performance",
       });
       treeRenderer.setSize(treeStage.clientWidth, treeStage.clientHeight);
-      treeRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      treeRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, window.innerWidth <= 768 ? 1.35 : 2));
 
       // Pencahayaan Hutan Tropis untuk Volume 3D Batang, Akar, dan Kanopi
       const treeAmbient = new THREE.AmbientLight(0xffffff, 0.92);
@@ -1334,12 +1348,26 @@ document.addEventListener("DOMContentLoaded", () => {
         treeRenderer.setSize(treeStage.clientWidth, treeStage.clientHeight);
       });
 
-      // Animasi Loop Pohon 3D
+      // Animasi Loop Pohon 3D (Hemat GPU: hanya merender ketika pohon terlihat di layar)
       const treeClock = new THREE.Clock();
       const projectedVec = new THREE.Vector3();
+      let isTreeInViewport = true;
+
+      if ("IntersectionObserver" in window && treeStage) {
+        const treeVisObserver = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              isTreeInViewport = entry.isIntersecting;
+            });
+          },
+          { rootMargin: "150px 0px" }
+        );
+        treeVisObserver.observe(treeStage);
+      }
 
       function animateTree3D() {
         requestAnimationFrame(animateTree3D);
+        if (!isTreeInViewport || document.hidden) return;
 
         const elapsed = treeClock.getElapsedTime();
 
@@ -1469,6 +1497,13 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentIndex = totalOriginal;
     let isTransitioning = false;
     let autoPlayTimer = null;
+    let transitionSafetyTimer = null;
+    let lastGalleryViewportWidth = window.innerWidth;
+
+    // Pastikan gambar pada klon kartu dimuat cepat agar saat digeser di mobile tidak kosong
+    docTrack.querySelectorAll(".doc-card-img").forEach((img) => {
+      img.setAttribute("decoding", "async");
+    });
 
     // Buat indikator dot navigasi untuk kartu original
     if (docDotsContainer && totalOriginal > 0) {
@@ -1479,13 +1514,14 @@ document.addEventListener("DOMContentLoaded", () => {
         dot.setAttribute("type", "button");
         dot.setAttribute("aria-label", `Menuju dokumentasi ${i + 1}`);
         dot.addEventListener("click", () => {
-          if (isTransitioning) return;
           const currentNorm = ((currentIndex % totalOriginal) + totalOriginal) % totalOriginal;
           let diff = i - currentNorm;
+          if (diff === 0) return;
           if (diff < -totalOriginal / 2) diff += totalOriginal;
           if (diff > totalOriginal / 2) diff -= totalOriginal;
           currentIndex += diff;
           goToSlide(currentIndex, true);
+          startAutoPlay();
         });
         docDotsContainer.appendChild(dot);
       }
@@ -1512,6 +1548,10 @@ document.addEventListener("DOMContentLoaded", () => {
       return (viewportWidth - cardWidth) / 2 - padLeft;
     }
 
+    function getSlideOffsetPx(index) {
+      return index * getStepSize() - getCenterShift();
+    }
+
     function updateDots(activeIdx) {
       if (!docDotsContainer) return;
       const dots = docDotsContainer.querySelectorAll(".doc-dot");
@@ -1521,16 +1561,43 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
+    function normalizeCloneIndexIfNeeded() {
+      isTransitioning = false;
+      if (transitionSafetyTimer) {
+        clearTimeout(transitionSafetyTimer);
+        transitionSafetyTimer = null;
+      }
+
+      if (currentIndex >= 2 * totalOriginal) {
+        currentIndex = ((currentIndex % totalOriginal) + totalOriginal) % totalOriginal + totalOriginal;
+        goToSlide(currentIndex, false);
+      } else if (currentIndex < totalOriginal) {
+        currentIndex = ((currentIndex % totalOriginal) + totalOriginal) % totalOriginal + totalOriginal;
+        goToSlide(currentIndex, false);
+      }
+    }
+
     function goToSlide(index, withTransition = true) {
+      if (transitionSafetyTimer) {
+        clearTimeout(transitionSafetyTimer);
+        transitionSafetyTimer = null;
+      }
+
       if (withTransition) {
-        docTrack.style.transition = "transform 0.65s cubic-bezier(0.25, 1, 0.5, 1)";
+        isTransitioning = true;
+        docTrack.style.transition = "transform 0.55s cubic-bezier(0.25, 1, 0.5, 1)";
+        // Safety fallback: jika transitionend terlewat di mobile (mis. saat scroll/resize bar URL),
+        // otomatis buka kunci transisi dan rapikan posisi klon agar slider tidak pernah macet
+        transitionSafetyTimer = setTimeout(() => {
+          normalizeCloneIndexIfNeeded();
+        }, 600);
       } else {
+        isTransitioning = false;
         docTrack.style.transition = "none";
       }
 
-      const centerShift = getCenterShift();
-      const offset = index * getStepSize() - centerShift;
-      docTrack.style.transform = `translateX(-${offset}px)`;
+      const offset = getSlideOffsetPx(index);
+      docTrack.style.transform = `translate3d(-${offset}px, 0, 0)`;
       updateDots(index);
 
       // Tandai kartu aktif di tengah untuk highlight responsif di mobile
@@ -1541,99 +1608,137 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function nextSlide() {
-      if (isTransitioning) return;
-      isTransitioning = true;
+      if (isTransitioning) {
+        normalizeCloneIndexIfNeeded();
+      }
       currentIndex++;
       goToSlide(currentIndex, true);
     }
 
     function prevSlide() {
-      if (isTransitioning) return;
-      isTransitioning = true;
+      if (isTransitioning) {
+        normalizeCloneIndexIfNeeded();
+      }
       currentIndex--;
       goToSlide(currentIndex, true);
     }
 
     // Reset instan TANPA TRANSISI saat mencapai batas klon agar looping selalu maju tanpa pernah balik ke kiri
     docTrack.addEventListener("transitionend", (e) => {
-      // Hanya tanggapi event transitionend dari docTrack itu sendiri
       if (e.target !== docTrack) return;
-      isTransitioning = false;
-
-      // Saat geser maju melewati kartu ke-6 menuju klon kartu 1 (indeks >= 2 * totalOriginal):
-      // Reset instan tanpa animasi ke posisi kartu 1 original (indeks totalOriginal).
-      // Hasilnya: gerak geser selalu maju ke kanan berkesinambungan tanpa pernah membal/mundur ke kiri!
-      if (currentIndex >= 2 * totalOriginal) {
-        currentIndex = currentIndex - totalOriginal;
-        goToSlide(currentIndex, false);
-      } else if (currentIndex < totalOriginal) {
-        // Saat geser mundur melewati kartu ke-1 menuju klon kiri:
-        // Reset instan ke posisi kartu 6 original di kanan tanpa animasi
-        currentIndex = currentIndex + totalOriginal;
-        goToSlide(currentIndex, false);
-      }
+      normalizeCloneIndexIfNeeded();
     });
 
     // Inisialisasi awal pada kartu original pertama (Card 1) tanpa animasi
     goToSlide(currentIndex, false);
 
     if (docBtnNext) {
-      docBtnNext.addEventListener("click", () => nextSlide());
+      docBtnNext.addEventListener("click", () => {
+        nextSlide();
+        startAutoPlay();
+      });
     }
 
     if (docBtnPrev) {
-      docBtnPrev.addEventListener("click", () => prevSlide());
+      docBtnPrev.addEventListener("click", () => {
+        prevSlide();
+        startAutoPlay();
+      });
     }
 
-    window.addEventListener("resize", () => {
-      goToSlide(currentIndex, false);
-    });
-
-    // Touch & Mouse Drag Handling untuk geser interaktif
+    // Touch & Mouse Drag Handling (1:1 responsif mengikuti jari di Mobile & Desktop)
     if (docViewport) {
       let isDragging = false;
+      let isHorizontalSwipe = null;
       let startX = 0;
+      let startY = 0;
       let currentX = 0;
+      let dragStartTime = 0;
+
+      const getClientXY = (e) => {
+        if (e.touches && e.touches.length > 0) {
+          return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        }
+        if (e.changedTouches && e.changedTouches.length > 0) {
+          return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
+        }
+        return { x: e.clientX || e.pageX || 0, y: e.clientY || e.pageY || 0 };
+      };
 
       const onPointerDown = (e) => {
+        if (isTransitioning) {
+          normalizeCloneIndexIfNeeded();
+        }
+        const pt = getClientXY(e);
         isDragging = true;
-        startX = e.pageX || (e.touches && e.touches[0].pageX) || 0;
-        currentX = startX;
+        isHorizontalSwipe = null;
+        startX = pt.x;
+        startY = pt.y;
+        currentX = pt.x;
+        dragStartTime = Date.now();
+        docTrack.style.transition = "none";
         stopAutoPlay();
       };
 
       const onPointerMove = (e) => {
         if (!isDragging) return;
-        currentX = e.pageX || (e.touches && e.touches[0].pageX) || 0;
+        const pt = getClientXY(e);
+        const dx = pt.x - startX;
+        const dy = pt.y - startY;
+
+        if (isHorizontalSwipe === null && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) {
+          isHorizontalSwipe = Math.abs(dx) >= Math.abs(dy);
+        }
+
+        if (isHorizontalSwipe === false) {
+          return;
+        }
+
+        currentX = pt.x;
+        const baseOffset = getSlideOffsetPx(currentIndex);
+        docTrack.style.transform = `translate3d(-${baseOffset - dx}px, 0, 0)`;
       };
 
       const onPointerUp = () => {
         if (!isDragging) return;
         isDragging = false;
         const diff = currentX - startX;
-        if (Math.abs(diff) > 45) {
+        const elapsed = Math.max(1, Date.now() - dragStartTime);
+        const velocity = Math.abs(diff) / elapsed;
+
+        if (isHorizontalSwipe !== false && (Math.abs(diff) > 24 || (Math.abs(diff) > 10 && velocity > 0.25))) {
           if (diff < 0) {
             nextSlide();
           } else {
             prevSlide();
           }
+          // Tandai agar klik kartu tidak tidak sengaja memicu pop-up modal saat habis swipe
+          docTrack._hkJustSwiped = Date.now();
+        } else {
+          goToSlide(currentIndex, true);
         }
         startAutoPlay();
       };
 
       docViewport.addEventListener("mousedown", onPointerDown);
-      docViewport.addEventListener("mousemove", onPointerMove);
+      window.addEventListener("mousemove", onPointerMove);
       window.addEventListener("mouseup", onPointerUp);
 
       docViewport.addEventListener("touchstart", onPointerDown, { passive: true });
       docViewport.addEventListener("touchmove", onPointerMove, { passive: true });
       docViewport.addEventListener("touchend", onPointerUp, { passive: true });
+      docViewport.addEventListener("touchcancel", onPointerUp, { passive: true });
     }
 
-    // Autoplay
+    // Autoplay (Berjalan otomatis di Desktop & Mobile)
+    let isGalleryVisible = true;
     function startAutoPlay() {
       stopAutoPlay();
-      autoPlayTimer = setInterval(nextSlide, 3500);
+      autoPlayTimer = setInterval(() => {
+        if (!document.hidden && isGalleryVisible) {
+          nextSlide();
+        }
+      }, 3200);
     }
 
     function stopAutoPlay() {
@@ -1643,11 +1748,30 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    docContainer.addEventListener("mouseenter", stopAutoPlay);
-    docContainer.addEventListener("mouseleave", startAutoPlay);
+    // Hanya jeda saat hover mouse di Desktop (agar sentuhan di layar HP tidak mematikan autoplay)
+    if (window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+      docContainer.addEventListener("mouseenter", stopAutoPlay);
+      docContainer.addEventListener("mouseleave", startAutoPlay);
+    }
 
+    if ("IntersectionObserver" in window) {
+      const galleryObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            isGalleryVisible = entry.isIntersecting;
+          });
+        },
+        { rootMargin: "100px 0px" }
+      );
+      galleryObserver.observe(docContainer);
+    }
+
+    // Hanya hitung ulang saat lebar layar benar-benar berubah (bukan saat bar URL mobile naik/turun)
     window.addEventListener("resize", () => {
-      goToSlide(currentIndex, false);
+      if (Math.abs(window.innerWidth - lastGalleryViewportWidth) > 2) {
+        lastGalleryViewportWidth = window.innerWidth;
+        goToSlide(currentIndex, false);
+      }
     });
 
     startAutoPlay();
@@ -2796,6 +2920,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const docCarouselTrack = document.getElementById("docCarouselTrack");
   if (docCarouselTrack) {
     docCarouselTrack.addEventListener("click", (e) => {
+      if (docCarouselTrack._hkJustSwiped && Date.now() - docCarouselTrack._hkJustSwiped < 350) {
+        return;
+      }
       const card = e.target.closest(".doc-card");
       if (!card) return;
 
@@ -3128,7 +3255,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let isWindowLoaded = document.readyState === "complete";
     let isDismissed = false;
     const startTime = Date.now();
-    const minDisplayDuration = 1200; // Minimal display duration for smooth feel
+    const minDisplayDuration = 750; // Minimal display duration for smooth feel
 
     const statusStages = [
       { max: 30, text: "Memuat aset visual rimba..." },
@@ -3211,7 +3338,7 @@ document.addEventListener("DOMContentLoaded", () => {
         clearInterval(progressInterval);
         dismissPreloader();
       }
-    }, 3200);
+    }, 1800);
   }
 
   // Inisialisasi loading screen

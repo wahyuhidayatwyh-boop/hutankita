@@ -142,21 +142,56 @@ function initHkVideoAudioFix() {
     return videoEl._hkBlobPromise;
   }
 
-  // Pre-buffer ke memori saat ada interaksi pengguna pertama (atau saat tombol suara diklik)
-  // agar tidak menggandakan unduhan jaringan pada pemuatan awal (Lighthouse initial load)
-  let blobPreloadTriggered = false;
-  function triggerVideoBlobPreloadOnce() {
-    if (blobPreloadTriggered) return;
-    blobPreloadTriggered = true;
-    if (ctaVideo) {
-      prepareInMemoryBlobVideo(ctaVideo, "assets/videos/footer-video.mp4");
-    }
+  const isLocalSimpleServer =
+    window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+
+  // Prioritaskan bandwidth 100% untuk Hero Video saat halaman pertama kali dibuka:
+  // Jeda sementara video di bagian bawah halaman (CTA/Footer) sampai pengguna menggulir mendekatinya
+  if (heroVideo) {
+    heroVideo.setAttribute("preload", "auto");
+    const p = heroVideo.play();
+    if (p && typeof p.catch === "function") p.catch(() => {});
+  }
+
+  if ("IntersectionObserver" in window) {
     if (heroVideo) {
-      prepareInMemoryBlobVideo(heroVideo, "assets/videos/hero-video.mp4");
+      const heroVidObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              if (heroVideo.paused) {
+                const p = heroVideo.play();
+                if (p && typeof p.catch === "function") p.catch(() => {});
+              }
+            } else if (heroVideo.muted && !heroVideo.paused) {
+              heroVideo.pause();
+            }
+          });
+        },
+        { rootMargin: "200px 0px" }
+      );
+      heroVidObserver.observe(heroVideo);
+    }
+
+    if (ctaVideo) {
+      const ctaVidObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              if (ctaVideo.paused) {
+                const p = ctaVideo.play();
+                if (p && typeof p.catch === "function") p.catch(() => {});
+              }
+            } else if (ctaVideo.muted && !ctaVideo.paused) {
+              ctaVideo.pause();
+            }
+          });
+        },
+        { rootMargin: "350px 0px" }
+      );
+      ctaVidObserver.observe(ctaVideo);
     }
   }
-  window.addEventListener("pointerdown", triggerVideoBlobPreloadOnce, { once: true, passive: true });
-  window.addEventListener("keydown", triggerVideoBlobPreloadOnce, { once: true, passive: true });
 
   function ensurePlayingWithAudio(videoEl, fallbackSrc) {
     if (!videoEl) return;
@@ -164,11 +199,9 @@ function initHkVideoAudioFix() {
 
     if (!videoEl.muted) {
       videoEl.removeAttribute("muted");
-      // Jika dijalankan di http.server dan Blob belum selesai dimuat, tunggu/aktifkan Blob
-      if (
-        !videoEl._hkBlobReady &&
-        (window.location.protocol === "http:" || window.location.protocol === "https:")
-      ) {
+      // Hanya gunakan Blob URL jika dijalankan di server lokal (localhost/python http.server)
+      // karena GitHub Pages / server produksi sudah mendukung HTTP 206 Partial Content secara langsung
+      if (!videoEl._hkBlobReady && isLocalSimpleServer) {
         prepareInMemoryBlobVideo(videoEl, fallbackSrc).then(() => {
           videoEl.muted = false;
           videoEl.removeAttribute("muted");
@@ -183,7 +216,6 @@ function initHkVideoAudioFix() {
     const playPromise = videoEl.play();
     if (playPromise && typeof playPromise.catch === "function") {
       playPromise.catch(() => {
-        // Fallback apabila peramban menahan pemutaran
         setTimeout(() => {
           const retry = videoEl.play();
           if (retry && typeof retry.catch === "function") retry.catch(() => {});
