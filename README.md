@@ -150,7 +150,7 @@ Seluruh pustaka pihak ketiga bersifat gratis dan sumber terbuka (open-source), s
 | `Leaflet 1.9.4` | Pustaka Peta Interaktif | https://leafletjs.com (unpkg) | BSD-2-Clause License |
 | `Outfit Font` | Tipografi | https://fonts.google.com/specimen/Outfit | SIL Open Font License (OFL) |
 | `Esri World Imagery` | Tile Peta Dasar | Esri, Maxar, Earthstar Geographics, GIS User Community | Ketentuan Layanan Esri ArcGIS Online |
-| `assets/videos/hero-video.mp4` | Video Latar Hero | Pinterest (https://id.pinterest.com) | Penggunaan Edukasi Non-Komersial |
+| `assets/videos/hero-video.mp4` | Video Latar Hero | Pinterest (https://youtu.be/C_ZyYpyZ6EI?si=JnbSr0rKEdqIyOMe) | Penggunaan Edukasi Non-Komersial |
 | `assets/videos/footer-video.mp4` | Video Bagian Ajakan | Pinterest (https://id.pinterest.com) | Penggunaan Edukasi Non-Komersial |
 | `assets/images/logo-tab.webp` | Ikon Tab Peramban | Pinterest (https://id.pinterest.com) | Penggunaan Edukasi Non-Komersial |
 | `assets/images/peta.webp` | Tekstur Peta Relief 3D | Pinterest (https://id.pinterest.com) | Penggunaan Edukasi Non-Komersial |

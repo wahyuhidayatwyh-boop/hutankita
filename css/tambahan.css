@@ -238,6 +238,25 @@ summary:focus-visible,
   }
 }
 
+.section-clean-kicker {
+  font-family: var(--font-family) !important;
+  font-size: 0.82rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.16em !important;
+  text-transform: uppercase !important;
+  color: var(--emerald-light, #34d399) !important;
+  display: inline-block !important;
+  line-height: 1.4 !important;
+  margin: 0 !important;
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+}
+
+.section-clean-kicker.kicker-amber {
+  color: #fbbf24 !important;
+}
+
 /* Penyelarasan Presisi Icon & Teks pada Tag Pill Gerakan Pelestarian Rimba Nusantara */
 .section-tag-pill {
   display: inline-flex !important;

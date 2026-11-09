@@ -1757,6 +1757,22 @@ body {
   gap: 0.8rem;
 }
 
+.section-clean-kicker {
+  font-family: var(--font-family);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--emerald-light, #34d399);
+  display: inline-block;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.section-clean-kicker.kicker-amber {
+  color: #fbbf24;
+}
+
 .section-tag-pill {
   display: inline-flex;
   align-items: center;
