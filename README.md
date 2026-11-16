@@ -187,11 +187,11 @@ Seluruh pustaka pihak ketiga bersifat gratis dan sumber terbuka (open-source), s
 
 ## Skor Pengujian Lighthouse
 
-Hasil pengujian menggunakan Google Lighthouse 13.5.0 melalui server lokal (`http://localhost:8000`) dalam mode penyamaran (Incognito):
+Hasil pengujian menggunakan Lighthouse pada **Microsoft Edge** dalam mode penyamaran (**InPrivate**) terhadap URL publikasi (`https://wahyuhidayatwyh-boop.github.io/hutankita/`):
 
 | Kategori Pengujian | Skor Desktop | Skor Mobile |
 | :--- | :--- | :--- |
-| Performance | 82 | 59 |
+| Performance | 88 *(86 pada uji pertama)* | 67 |
 | Accessibility | 100 | 100 |
 | Best Practices | 100 | 100 |
 | SEO | 100 | 100 |
