@@ -1114,10 +1114,92 @@ summary:focus-visible,
   }
 
   .hk-btn-open-quiz {
-    font-size: 0.62rem !important;
-    padding: 0.42rem 0.45rem !important;
-    letter-spacing: -0.025em !important;
+    font-size: 0.78rem !important;
+    padding: 0.72rem 0.9rem !important;
   }
+}
+
+/* ==========================================================================
+   PERBAIKAN RESPONSIF CTA & TOMBOL PANJANG DI LAYAR HP (TIDAK KEPOTONG)
+   ========================================================================== */
+@media (max-width: 900px) {
+  .forest-cta-section,
+  .cta-inner-container {
+    max-width: 100% !important;
+    overflow-x: hidden;
+  }
+
+  .cta-layout-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .cta-content-col,
+  .cta-video-col {
+    min-width: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .cta-title {
+    font-size: clamp(1.55rem, 6.2vw, 2.15rem) !important;
+    line-height: 1.24 !important;
+    max-width: 100% !important;
+    overflow-wrap: break-word;
+  }
+
+  .cta-desc {
+    font-size: 0.92rem !important;
+    max-width: 100% !important;
+  }
+
+  .cta-button-group {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .hk-anatomi-quiz-cta {
+    box-sizing: border-box !important;
+    max-width: 100% !important;
+  }
+
+  .btn-cta-primary,
+  .btn-cta-secondary,
+  .hk-btn-open-quiz,
+  .hk-btn-open-quiz-inline,
+  .action-toggle-btn,
+  .btn-clean-reset,
+  #btnOpenQuizModal,
+  #btnOpenQuizFromDetail {
+    width: auto !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    white-space: normal !important;
+    text-align: center !important;
+    line-height: 1.32 !important;
+    justify-content: center !important;
+    padding: 0.78rem 1.05rem !important;
+    font-size: clamp(0.8rem, 3.6vw, 0.92rem) !important;
+  }
+
+  .cta-button-group .btn-cta-primary,
+  .cta-button-group .btn-cta-secondary {
+    width: 100% !important;
+  }
+
+  .btn-cta-primary svg,
+  .btn-cta-secondary svg,
+  .hk-btn-open-quiz svg,
+  .hk-btn-open-quiz-inline svg {
+    flex-shrink: 0 !important;
+  }
+}
+
+/* Pastikan tombol clear (×) & dropdown tidak pernah muncul saat search tertutup */
+.search-box:not(.is-search-open) .search-clear-btn,
+.search-box:not(.is-search-open) .search-results-dropdown {
+  display: none !important;
 }
 
 /* ==========================================================================

@@ -39,8 +39,23 @@ document.addEventListener("DOMContentLoaded", () => {
   const heroNav = document.querySelector(".hero-nav");
   const searchClearBtn = document.getElementById("searchClearBtn");
   const searchResultsDropdown = document.getElementById("searchResultsDropdown");
+  let searchDebounceTimer = null;
 
   function setSearchBarOpenState(isOpen) {
+    if (!isOpen) {
+      clearTimeout(searchDebounceTimer);
+      if (searchResultsDropdown) {
+        searchResultsDropdown.classList.remove("is-active");
+      }
+      if (searchClearBtn) {
+        searchClearBtn.classList.add("hidden");
+      }
+      if (searchInput && document.activeElement === searchInput) {
+        searchInput.blur();
+      }
+    } else if (searchClearBtn && searchInput && searchInput.value.trim()) {
+      searchClearBtn.classList.remove("hidden");
+    }
     if (searchInput) searchInput.classList.toggle("open", isOpen);
     if (searchBox) searchBox.classList.toggle("is-search-open", isOpen);
     if (heroNav) heroNav.classList.toggle("is-search-active", isOpen);
@@ -380,6 +395,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function performSearch(rawQuery) {
     if (!searchResultsDropdown) return;
+    if (searchInput && !searchInput.classList.contains("open")) {
+      closeSearchDropdown();
+      return;
+    }
     const isEn = isEnglishLang();
     const query = (rawQuery || "").trim().toLowerCase();
 
@@ -577,12 +596,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     searchInput.addEventListener("focus", () => {
+      if (!searchInput.classList.contains("open")) return;
       if (!searchInput.value.trim()) {
         showInitialRecommendations();
+      } else {
+        performSearch(searchInput.value);
       }
     });
 
-    let searchDebounceTimer = null;
     searchInput.addEventListener("input", () => {
       clearTimeout(searchDebounceTimer);
       searchDebounceTimer = setTimeout(() => {
