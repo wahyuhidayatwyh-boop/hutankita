@@ -191,7 +191,7 @@ Hasil pengujian menggunakan Lighthouse pada **Microsoft Edge** dalam mode penyam
 
 | Kategori Pengujian | Skor Desktop | Skor Mobile |
 | :--- | :--- | :--- |
-| Performance | 88 *(86 pada uji pertama)* | 67 |
+| Performance | 88 *(86 pada uji pertama)* | 67 (61 pada uji kedua) |
 | Accessibility | 100 | 100 |
 | Best Practices | 100 | 100 |
 | SEO | 100 | 100 |
