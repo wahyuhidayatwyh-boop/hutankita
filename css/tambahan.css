@@ -1114,8 +1114,9 @@ summary:focus-visible,
   }
 
   .hk-btn-open-quiz {
-    font-size: 0.78rem !important;
-    padding: 0.72rem 0.9rem !important;
+    font-size: 0.62rem !important;
+    padding: 0.42rem 0.45rem !important;
+    letter-spacing: -0.025em !important;
   }
 }
 
@@ -1164,15 +1165,9 @@ summary:focus-visible,
     max-width: 100% !important;
   }
 
-  .btn-cta-primary,
-  .btn-cta-secondary,
-  .hk-btn-open-quiz,
-  .hk-btn-open-quiz-inline,
-  .action-toggle-btn,
-  .btn-clean-reset,
-  #btnOpenQuizModal,
-  #btnOpenQuizFromDetail {
-    width: auto !important;
+  .cta-button-group .btn-cta-primary,
+  .cta-button-group .btn-cta-secondary {
+    width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
     white-space: normal !important;
@@ -1183,16 +1178,19 @@ summary:focus-visible,
     font-size: clamp(0.8rem, 3.6vw, 0.92rem) !important;
   }
 
-  .cta-button-group .btn-cta-primary,
-  .cta-button-group .btn-cta-secondary {
-    width: 100% !important;
+  .cta-button-group .btn-cta-primary svg,
+  .cta-button-group .btn-cta-secondary svg {
+    flex-shrink: 0 !important;
   }
 
-  .btn-cta-primary svg,
-  .btn-cta-secondary svg,
-  .hk-btn-open-quiz svg,
-  .hk-btn-open-quiz-inline svg {
-    flex-shrink: 0 !important;
+  #btnOpenQuizModal.hk-btn-open-quiz {
+    width: auto !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 0.44rem 0.62rem !important;
+    font-size: clamp(0.58rem, 2.55vw, 0.74rem) !important;
+    gap: 0.3rem !important;
+    white-space: nowrap !important;
   }
 }
 

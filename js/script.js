@@ -393,6 +393,23 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   }
 
+  function bindSearchHintPills() {
+    if (!searchResultsDropdown) return;
+    searchResultsDropdown.querySelectorAll(".search-hint-pill").forEach((pill) => {
+      pill.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const hint = pill.getAttribute("data-hint");
+        if (searchInput && hint) {
+          setSearchBarOpenState(true);
+          searchInput.value = hint;
+          searchInput.focus();
+          performSearch(hint);
+        }
+      });
+    });
+  }
+
   function performSearch(rawQuery) {
     if (!searchResultsDropdown) return;
     if (searchInput && !searchInput.classList.contains("open")) {
@@ -439,17 +456,7 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       `;
       searchResultsDropdown.classList.add("is-active");
-
-      searchResultsDropdown.querySelectorAll(".search-hint-pill").forEach((pill) => {
-        pill.addEventListener("click", () => {
-          const hint = pill.getAttribute("data-hint");
-          if (searchInput) {
-            searchInput.value = hint;
-            searchInput.focus();
-            performSearch(hint);
-          }
-        });
-      });
+      bindSearchHintPills();
       return;
     }
 
@@ -513,17 +520,7 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     `;
     searchResultsDropdown.classList.add("is-active");
-
-    searchResultsDropdown.querySelectorAll(".search-hint-pill").forEach((pill) => {
-      pill.addEventListener("click", () => {
-        const hint = pill.getAttribute("data-hint");
-        if (searchInput) {
-          searchInput.value = hint;
-          searchInput.focus();
-          performSearch(hint);
-        }
-      });
-    });
+    bindSearchHintPills();
   }
 
   window.addEventListener("hk:languagechange", () => {
@@ -638,6 +635,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     document.addEventListener("click", (e) => {
+      if (!e.target || !e.target.isConnected) return;
       if (!e.target.closest(".search-box")) {
         closeSearchDropdown();
         if (!searchInput.value.trim() || window.innerWidth <= 820) {
