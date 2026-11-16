@@ -1096,8 +1096,59 @@ summary:focus-visible,
   }
 
   .hk-pledge-dialog {
-    width: calc(100% - 1rem);
-    padding: 1.15rem 0.85rem;
+    width: min(92vw, 420px) !important;
+    max-height: 80dvh !important;
+    padding: 0.95rem 0.85rem !important;
+    border-radius: 16px !important;
+  }
+
+  .hk-pledge-dialog-inner {
+    gap: 0.75rem !important;
+  }
+
+  .hk-pledge-dialog-header {
+    padding-bottom: 0.55rem !important;
+  }
+
+  .hk-pledge-dialog-header .hk-subtitle {
+    font-size: 0.98rem !important;
+    line-height: 1.25 !important;
+  }
+
+  .hk-dialog-close {
+    width: 30px !important;
+    height: 30px !important;
+  }
+
+  .hk-pledge-dialog .hk-text {
+    font-size: 0.8rem !important;
+    line-height: 1.48 !important;
+  }
+
+  .hk-pledge-layout {
+    gap: 1rem !important;
+  }
+
+  .hk-pledge-choice {
+    padding: 0.48rem 0.6rem !important;
+    font-size: 0.78rem !important;
+    line-height: 1.38 !important;
+  }
+
+  .hk-quiz-container {
+    padding: 0.8rem 0.7rem !important;
+    gap: 0.75rem !important;
+  }
+
+  .hk-quiz-question {
+    font-size: 0.92rem !important;
+    line-height: 1.4 !important;
+  }
+
+  .hk-quiz-option-btn {
+    padding: 0.6rem 0.72rem !important;
+    font-size: 0.8rem !important;
+    line-height: 1.38 !important;
   }
 }
 
@@ -1191,6 +1242,165 @@ summary:focus-visible,
     font-size: clamp(0.58rem, 2.55vw, 0.74rem) !important;
     gap: 0.3rem !important;
     white-space: nowrap !important;
+  }
+
+  /* Dropdown Undang-Undang & Pasal lebih ringkas di mobile */
+  .penalties-accordion-list {
+    gap: 0.6rem !important;
+  }
+
+  .penalty-accordion-card {
+    border-radius: 14px !important;
+  }
+
+  .penalty-accordion-header {
+    padding: 0.68rem 0.82rem !important;
+    gap: 0.55rem !important;
+  }
+
+  .accordion-header-left {
+    gap: 0.6rem !important;
+    min-width: 0;
+  }
+
+  .penalty-icon-wrap {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 9px !important;
+  }
+
+  .penalty-icon-wrap svg {
+    width: 15px !important;
+    height: 15px !important;
+  }
+
+  .accordion-title-meta {
+    gap: 0.18rem !important;
+    min-width: 0;
+  }
+
+  .accordion-card-title {
+    font-size: 0.84rem !important;
+    line-height: 1.25 !important;
+  }
+
+  .penalty-law-tag {
+    font-size: 0.62rem !important;
+    padding: 0.12rem 0.4rem !important;
+    line-height: 1.25 !important;
+  }
+
+  .accordion-chevron-wrap {
+    padding: 0.24rem 0.52rem !important;
+    font-size: 0.66rem !important;
+    gap: 0.22rem !important;
+  }
+
+  .accordion-chevron {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  .accordion-body-inner {
+    padding: 0.75rem 0.82rem 0.9rem !important;
+    gap: 0.75rem !important;
+  }
+
+  .penalty-summary-metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 0.4rem !important;
+  }
+
+  .metric-box {
+    padding: 0.48rem 0.45rem !important;
+    border-radius: 10px !important;
+    gap: 0.14rem !important;
+  }
+
+  .metric-label {
+    font-size: 0.56rem !important;
+    line-height: 1.2 !important;
+  }
+
+  .metric-val {
+    font-size: 0.8rem !important;
+    line-height: 1.18 !important;
+    overflow-wrap: break-word;
+  }
+
+  .metric-sub {
+    font-size: 0.6rem !important;
+    line-height: 1.22 !important;
+  }
+
+  .penalty-points-list {
+    font-size: 0.76rem !important;
+    line-height: 1.46 !important;
+    gap: 0.42rem !important;
+  }
+
+  .penalty-points-list li {
+    padding-left: 0.95rem !important;
+  }
+
+  /* Semua pop-up kartu & hotline lebih ringkas dan tidak memenuhi layar di mobile */
+  .site-modal-overlay {
+    padding: 0.85rem !important;
+  }
+
+  .site-modal-dialog {
+    max-width: min(92vw, 390px) !important;
+    max-height: 78dvh !important;
+    border-radius: 18px !important;
+  }
+
+  .modal-close-btn {
+    width: 32px !important;
+    height: 32px !important;
+    top: 10px !important;
+    right: 10px !important;
+  }
+
+  .modal-close-btn svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .modal-photo-wrap {
+    height: 160px !important;
+    border-radius: 18px 18px 0 0 !important;
+  }
+
+  .modal-photo-tag {
+    bottom: 10px !important;
+    left: 12px !important;
+    font-size: 0.66rem !important;
+    padding: 0.22rem 0.62rem !important;
+  }
+
+  .modal-body-content {
+    padding: 0.95rem 1.05rem 1.1rem !important;
+    gap: 0.6rem !important;
+  }
+
+  .modal-card-title {
+    font-size: 1.08rem !important;
+  }
+
+  .modal-card-desc {
+    font-size: 0.82rem !important;
+    line-height: 1.5 !important;
+  }
+
+  .modal-extra-info {
+    font-size: 0.76rem !important;
+    line-height: 1.45 !important;
+    padding: 0.6rem 0.75rem !important;
+  }
+
+  .btn-modal-dismiss {
+    font-size: 0.78rem !important;
+    padding: 0.45rem 0.95rem !important;
   }
 }
 
