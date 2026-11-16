@@ -15,6 +15,7 @@
   const TRANSLATIONS = {
     id: {
       // PRELOADER & AKSESIBILITAS
+      "page_title": "HutanKita - Edukasi Hutan Tropis Indonesia",
       "skip_link": "Lewati ke konten utama",
       "preloader_title": "HutanKita",
       "preloader_desc": "Menjelajahi keajaiban rimba & ekosistem paru-paru dunia nusantara",
@@ -279,7 +280,11 @@
       "cta_title": "Mari Jaga Rimba Kita, Demi Masa Depan Bumi",
       "cta_desc": "Setiap hembusan napas kita berhutang pada rimbunnya hutan tropis Indonesia. Nyatakan komitmen Anda melalui Ikrar Rimba dan bagikan sertifikat aksi nyata ini kepada dunia.",
       "cta_btn_pledge": "Buat Sertifikat Ikrar Rimba",
+      "cta_btn_pledged": "Ikrar Anda Telah Tercatat!",
       "cta_btn_quiz": "Uji Kompetensi: Kuis 15 Soal",
+      "wa_report_href": "https://wa.me/6283843653251?text=Halo%20Posko%20HutanKita%2C%20saya%20ingin%20melaporkan%20kejadian%20kebakaran%20hutan",
+      "wa_report_short_href": "https://wa.me/6283843653251?text=Halo%20Posko%20HutanKita%2C%20saya%20ingin%20lapor%20karhutla",
+      "wa_float_aria": "WhatsApp Posko HutanKita",
 
       // TENTANG KAMI (#tentang)
       "about_kicker": "TENTANG HUTANKITA",
@@ -388,7 +393,7 @@
 
       // FOOTER
       "nav_home_mobile": "Beranda",
-      "pledge_dialog_desc_full": "Isi nama lengkap Anda dan pilih satu komitmen pelestarian. Sertifikat &amp; Badge resmi bertanda tangan Founder HutanKita akan dibuat secara otomatis dan siap diunduh dalam resolusi tinggi (1400x1000 piksel).",
+      "pledge_dialog_desc_full": "Isi nama lengkap Anda dan pilih satu komitmen pelestarian. Sertifikat & Badge resmi bertanda tangan Founder HutanKita akan dibuat secara otomatis dan siap diunduh dalam resolusi tinggi (1400x1000 piksel).",
       "pledge_name_label_full": "Nama Lengkap Penerima Sertifikat",
       "pledge_name_placeholder_full": "Tulis nama lengkap Anda untuk sertifikat ikrar",
       "pledge_choices_legend": "Pilih satu komitmen pelestarian rimba",
@@ -398,24 +403,24 @@
       "pledge_opt_4": "Menanam dan merawat pohon lokal di lingkungan sekitar untuk menjaga resapan air dan cadangan karbon.",
       "pledge_opt_5": "Membagikan pengetahuan tentang fungsi hutan hujan tropis dan lahan gambut kepada keluarga serta teman.",
       "pledge_saved_note": "Perubahan disimpan otomatis di peramban perangkat ini.",
-      "pledge_preview_label_full": "Pratinjau Sertifikat &amp; Badge Ikrar (1400x1000 px)",
+      "pledge_preview_label_full": "Pratinjau Sertifikat & Badge Ikrar (1400x1000 px)",
       "footer_tagline": "Portal Edukasi Hutan Tropis Indonesia",
       "footer_tagline_long": "Platform edukasi sains botani, visualisasi 3D anatomi pohon, investigasi ancaman perusakan alam, serta pemantauan terpadu kebakaran hutan tropis nusantara.",
       "footer_desc": "Edukasi botani 3D, informasi pelestarian ekosistem hutan hujan tropis, dan pemantauan titik panas nusantara.",
       "footer_nav_heading": "Navigasi Cepat",
       "footer_link_home": "Beranda Utama",
-      "footer_link_anatomy": "Anatomi Pohon &amp; Botani 3D",
+      "footer_link_anatomy": "Anatomi Pohon & Botani 3D",
       "footer_link_crisis": "Krisis Perusakan Hutan",
       "footer_link_gallery": "Galeri Rekaman Aksi",
       "footer_link_map": "Peta Hotspot Satelit",
       "footer_link_contacts": "Kontak Posko Darurat",
       "footer_contacts_heading": "Kontak Pengaduan",
       "footer_emerg_1": "<strong>Damkar Nasional:</strong> <a href=\"tel:113\">113 / 112</a>",
-      "footer_emerg_2": "<strong>Posko HutanKita:</strong> <a href=\"https://wa.me/6283843653251\" target=\"_blank\" rel=\"noopener noreferrer\">0838-4365-3251</a>",
+      "footer_emerg_2": "<strong>Posko HutanKita:</strong> <a href=\"https://wa.me/6283843653251?text=Halo%20Posko%20HutanKita%2C%20saya%20ingin%20melaporkan%20kejadian%20kebakaran%20hutan\" target=\"_blank\" rel=\"noopener noreferrer\">0838-4365-3251</a>",
       "footer_emerg_3": "<strong>BPBD Pusdalops:</strong> <a href=\"tel:112\">112 (Bebas Pulsa)</a>",
       "footer_emerg_4": "<strong>Polisi Gakkum:</strong> <a href=\"tel:110\">110 (Pengaduan Pidana)</a>",
       "footer_emerg_5": "<strong>Medis &amp; ISPA:</strong> <a href=\"tel:119\">119 (Darurat Ambulans)</a>",
-      "footer_src_1": "Kementerian Lingkungan Hidup &amp; Kehutanan (Sipongi+)",
+      "footer_src_1": "Kementerian Lingkungan Hidup & Kehutanan (Sipongi+)",
       "footer_src_2": "NASA Earthdata (FIRMS Active Fire System)",
       "footer_src_3": "Badan Meteorologi, Klimatologi, dan Geofisika (BMKG)",
       "footer_src_4": "Badan Nasional Penanggulangan Bencana (BNPB)",
@@ -440,6 +445,7 @@
       "footer_sources_heading": "Data Sources & Partnerships",
       "footer_back_to_top": "Back to Top",
       // PRELOADER & ACCESSIBILITY
+      "page_title": "HutanKita - Indonesian Tropical Rainforest Education",
       "skip_link": "Skip to main content",
       "preloader_title": "HutanKita",
       "preloader_desc": "Exploring the wonders of the rainforest & the archipelago's lungs of the world",
@@ -692,7 +698,11 @@
       "cta_title": "Let's Protect Our Rainforest, For Earth's Future",
       "cta_desc": "Every breath we take owes its vitality to Indonesia's lush tropical forests. Affirm your commitment with the Rainforest Pledge and share your certificate with the world.",
       "cta_btn_pledge": "Generate Rainforest Pledge Certificate",
+      "cta_btn_pledged": "Your Pledge Is Recorded!",
       "cta_btn_quiz": "Take Ecosystem Quiz (15 Questions)",
+      "wa_report_href": "https://wa.me/6283843653251?text=Hello%20HutanKita%20Command%20Post%2C%20I%20would%20like%20to%20report%20a%20forest%20fire%20incident",
+      "wa_report_short_href": "https://wa.me/6283843653251?text=Hello%20HutanKita%20Command%20Post%2C%20I%20would%20like%20to%20report%20a%20wildfire",
+      "wa_float_aria": "WhatsApp HutanKita Command Post",
 
       // ABOUT US (#tentang)
       "about_kicker": "ABOUT HUTANKITA",
@@ -801,7 +811,7 @@
 
       // FOOTER
       "nav_home_mobile": "Home",
-      "pledge_dialog_desc_full": "Enter your full name and select one conservation commitment. An official Certificate &amp; Badge signed by the Founder of HutanKita will be generated automatically and ready for high-resolution download (1400x1000 px).",
+      "pledge_dialog_desc_full": "Enter your full name and select one conservation commitment. An official Certificate & Badge signed by the Founder of HutanKita will be generated automatically and ready for high-resolution download (1400x1000 px).",
       "pledge_name_label_full": "Recipient Full Name",
       "pledge_name_placeholder_full": "Enter your full name for the pledge certificate",
       "pledge_choices_legend": "Choose one rainforest conservation commitment",
@@ -811,24 +821,24 @@
       "pledge_opt_4": "Plant and nurture native trees in local surroundings to preserve water absorption and carbon reserves.",
       "pledge_opt_5": "Share knowledge about tropical rainforests and peatland functions with family and friends.",
       "pledge_saved_note": "Changes are automatically saved in this device's browser.",
-      "pledge_preview_label_full": "Pledge Certificate &amp; Badge Preview (1400x1000 px)",
+      "pledge_preview_label_full": "Pledge Certificate & Badge Preview (1400x1000 px)",
       "footer_tagline": "Indonesian Tropical Rainforest Education Portal",
       "footer_tagline_long": "Botanical science education platform, 3D tree anatomy visualization, forest destruction investigation, and integrated archipelago rainforest fire monitoring.",
       "footer_desc": "3D botanical education, tropical rainforest ecosystem conservation information, and archipelago satellite hotspot monitoring.",
       "footer_nav_heading": "Quick Navigation",
       "footer_link_home": "Home",
-      "footer_link_anatomy": "3D Tree Anatomy &amp; Botany",
+      "footer_link_anatomy": "3D Tree Anatomy & Botany",
       "footer_link_crisis": "Forest Destruction Crisis",
       "footer_link_gallery": "Conservation Action Gallery",
       "footer_link_map": "Satellite Hotspot Map",
       "footer_link_contacts": "Emergency Command Contacts",
       "footer_contacts_heading": "Emergency Hotlines",
       "footer_emerg_1": "<strong>National Fire Brigade:</strong> <a href=\"tel:113\">113 / 112</a>",
-      "footer_emerg_2": "<strong>HutanKita Command Post:</strong> <a href=\"https://wa.me/6283843653251\" target=\"_blank\" rel=\"noopener noreferrer\">0838-4365-3251</a>",
+      "footer_emerg_2": "<strong>HutanKita Command Post:</strong> <a href=\"https://wa.me/6283843653251?text=Hello%20HutanKita%20Command%20Post%2C%20I%20would%20like%20to%20report%20a%20forest%20fire%20incident\" target=\"_blank\" rel=\"noopener noreferrer\">0838-4365-3251</a>",
       "footer_emerg_3": "<strong>BPBD Disaster Ops:</strong> <a href=\"tel:112\">112 (Toll-Free)</a>",
       "footer_emerg_4": "<strong>Forestry Police (Gakkum):</strong> <a href=\"tel:110\">110 (Criminal Reports)</a>",
       "footer_emerg_5": "<strong>Medical &amp; Respiratory:</strong> <a href=\"tel:119\">119 (Emergency Ambulance)</a>",
-      "footer_src_1": "Ministry of Environment &amp; Forestry (Sipongi+)",
+      "footer_src_1": "Ministry of Environment & Forestry (Sipongi+)",
       "footer_src_2": "NASA Earthdata (FIRMS Active Fire System)",
       "footer_src_3": "Meteorology, Climatology, and Geophysical Agency (BMKG)",
       "footer_src_4": "National Agency for Disaster Management (BNPB)",
@@ -864,6 +874,7 @@
 
   function updateDomTranslations() {
     document.documentElement.lang = currentLang;
+    document.title = t("page_title", document.title);
 
     // 1. Text / innerHTML
     const translatables = document.querySelectorAll("[data-i18n]");
@@ -907,6 +918,14 @@
       const key = el.getAttribute("data-i18n-aria");
       const val = t(key);
       if (val) el.setAttribute("aria-label", val);
+    });
+
+    // 4b. Hrefs (mis. template pesan WhatsApp)
+    const hrefs = document.querySelectorAll("[data-i18n-href]");
+    hrefs.forEach((el) => {
+      const key = el.getAttribute("data-i18n-href");
+      const val = t(key);
+      if (val) el.setAttribute("href", val);
     });
 
     // 5. Update Switcher UI Buttons

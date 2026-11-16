@@ -450,7 +450,9 @@ function drawWhiteCertificateBase(ctx, width, height, config) {
   ctx.textBaseline = "middle";
 
   // Pill kapsul organisasi di bagian atas
-  const pillW = 540;
+  const topPillStr = config.topPillText || "HUTANKITA INDONESIA  •  PORTAL EDUKASI & KONSERVASI RIMBA";
+  ctx.font = "700 15px 'Outfit', sans-serif";
+  const pillW = Math.min(920, Math.max(540, ctx.measureText(topPillStr).width + 64));
   const pillH = 38;
   const pillX = centerX - pillW / 2;
   const pillY = 92;
@@ -462,10 +464,9 @@ function drawWhiteCertificateBase(ctx, width, height, config) {
   ctx.fill();
   ctx.stroke();
 
-  ctx.font = "700 15px 'Outfit', sans-serif";
   ctx.fillStyle = "#065f46";
   ctx.fillText(
-    config.topPillText || "HUTANKITA INDONESIA  •  PORTAL EDUKASI & KONSERVasi RIMBA",
+    topPillStr,
     centerX,
     pillY + pillH / 2 + 1
   );
@@ -919,7 +920,9 @@ function initHkPledgeCardDialog() {
           .toLowerCase()
           .replace(/[^a-z0-9]+/g, "-")
           .replace(/^-|-$/g, "");
-        link.download = `sertifikat-ikrar-hutankita-${cleanName || "indonesia"}.png`;
+        link.download = isHkEnglish()
+          ? `hutankita-pledge-certificate-${cleanName || "indonesia"}.png`
+          : `sertifikat-ikrar-hutankita-${cleanName || "indonesia"}.png`;
         link.href = dataUrl;
         document.body.appendChild(link);
         link.click();
@@ -944,6 +947,11 @@ function initHkPledgeCardDialog() {
   }
 
   window.addEventListener("hk:languagechange", () => {
+    if (savedNote) {
+      savedNote.textContent = isHkEnglish()
+        ? "Automatically saved in this device's browser."
+        : "Tersimpan otomatis di peramban perangkat ini.";
+    }
     drawPledgeCertificate();
   });
 }
@@ -1745,6 +1753,17 @@ function initHkForestQuiz() {
     }
   ];
 
+  function shuffleArray(items) {
+    const arr = [...items];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const tmp = arr[i];
+      arr[i] = arr[j];
+      arr[j] = tmp;
+    }
+    return arr;
+  }
+
   function getActiveQuizBank() {
     const isEn = typeof window.getHkLanguage === "function" && window.getHkLanguage() === "en";
     return isEn ? QUIZ_BANK_EN : QUIZ_BANK_ID;
@@ -1783,11 +1802,12 @@ function initHkForestQuiz() {
     const score100 = Math.round((correctCount / total) * 100);
     const predicate = getQuizPredicate(score100);
 
+    const isEn = typeof window.getHkLanguage === "function" && window.getHkLanguage() === "en";
     const rawName =
       (certNameInput ? certNameInput.value : "").trim() ||
       participantName ||
       (document.getElementById("hkPledgeName")?.value || "").trim();
-    const displayName = rawName || "Peserta Edukasi HutanKita";
+    const displayName = rawName || (isEn ? "HutanKita Quiz Participant" : "Peserta Edukasi HutanKita");
     const dateStr = formatIndonesianDate(new Date());
 
     let hash = 5000 + score100 * 17;
@@ -1795,7 +1815,6 @@ function initHkForestQuiz() {
       hash = (hash * 29 + displayName.charCodeAt(i)) % 9000 + 1000;
     }
 
-    const isEn = typeof window.getHkLanguage === "function" && window.getHkLanguage() === "en";
     drawWhiteCertificateBase(ctx, width, height, {
       topPillText: isEn
         ? "HUTANKITA INDONESIA  •  CENTER FOR ECOSYSTEM & BOTANICAL LITERACY"
@@ -1837,7 +1856,7 @@ function initHkForestQuiz() {
     ctx.stroke();
 
     // Kotak Hasil Nilai & Predikat Badge
-    const scoreBoxW = 980;
+    const scoreBoxW = 1040;
     const scoreBoxH = 148;
     const scoreBoxX = centerX - scoreBoxW / 2;
     const scoreBoxY = 406;
@@ -1853,18 +1872,18 @@ function initHkForestQuiz() {
     ctx.stroke();
 
     // 3 Kolom Metrik di dalam Kotak Nilai
-    const col1X = scoreBoxX + 200;
+    const col1X = scoreBoxX + 150;
     const col2X = centerX;
-    const col3X = scoreBoxX + scoreBoxW - 200;
+    const col3X = scoreBoxX + scoreBoxW - 150;
 
     // Pembatas vertikal di dalam kotak nilai
     ctx.strokeStyle = "rgba(16, 185, 129, 0.28)";
     ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.moveTo(scoreBoxX + 350, scoreBoxY + 24);
-    ctx.lineTo(scoreBoxX + 350, scoreBoxY + scoreBoxH - 24);
-    ctx.moveTo(scoreBoxX + scoreBoxW - 350, scoreBoxY + 24);
-    ctx.lineTo(scoreBoxX + scoreBoxW - 350, scoreBoxY + scoreBoxH - 24);
+    ctx.moveTo(scoreBoxX + 300, scoreBoxY + 24);
+    ctx.lineTo(scoreBoxX + 300, scoreBoxY + scoreBoxH - 24);
+    ctx.moveTo(scoreBoxX + scoreBoxW - 300, scoreBoxY + 24);
+    ctx.lineTo(scoreBoxX + scoreBoxW - 300, scoreBoxY + scoreBoxH - 24);
     ctx.stroke();
 
     // Kolom 1: Nilai Angka
@@ -1879,15 +1898,19 @@ function initHkForestQuiz() {
     ctx.font = "600 15px 'Outfit', sans-serif";
     ctx.fillStyle = "#b48a3e";
     ctx.fillText(isEn ? "COMPETENCY BADGE" : "PREDIKAT BADGE KOMPETENSI", col2X, scoreBoxY + 42);
-    ctx.font = "800 20px 'Outfit', sans-serif";
+    ctx.font = "800 19px 'Outfit', sans-serif";
     ctx.fillStyle = "#064e3b";
-    ctx.fillText(predicate, col2X, scoreBoxY + 92);
+    const predLines = wrapCanvasLines(ctx, predicate, 390).slice(0, 2);
+    const predStartY = predLines.length > 1 ? scoreBoxY + 84 : scoreBoxY + 94;
+    predLines.forEach((line, idx) => {
+      ctx.fillText(line, col2X, predStartY + idx * 24);
+    });
 
     // Kolom 3: Ketepatan Jawaban
     ctx.font = "600 15px 'Outfit', sans-serif";
     ctx.fillStyle = "#047857";
     ctx.fillText(isEn ? "ACCURACY RATE" : "KETEPATAN SOAL", col3X, scoreBoxY + 42);
-    ctx.font = "800 36px 'Outfit', sans-serif";
+    ctx.font = "800 32px 'Outfit', sans-serif";
     ctx.fillStyle = "#052e16";
     ctx.fillText(isEn ? `${correctCount} / ${total} Correct` : `${correctCount} / ${total} Soal`, col3X, scoreBoxY + 94);
 
@@ -1991,11 +2014,13 @@ function initHkForestQuiz() {
   }
 
   function startNewSession() {
-    sessionQuestions = shuffleArray(getActiveQuizBank()).map((item) => ({
+    const indexedBank = getActiveQuizBank().map((item, bankIndex) => ({ item, bankIndex }));
+    sessionQuestions = shuffleArray(indexedBank).map(({ item, bankIndex }) => ({
+      bankIndex,
       topic: item.topic,
       question: item.question,
       explanation: item.explanation,
-      options: shuffleArray(item.options)
+      options: shuffleArray(item.options.map((opt, optIndex) => ({ ...opt, optIndex })))
     }));
     currentQuestionIndex = 0;
     correctCount = 0;
@@ -2278,7 +2303,9 @@ function initHkForestQuiz() {
           .toLowerCase()
           .replace(/[^a-z0-9]+/g, "-")
           .replace(/^-|-$/g, "");
-        link.download = `sertifikat-kuis-hutankita-${cleanName || "indonesia"}.png`;
+        link.download = isHkEnglish()
+          ? `hutankita-quiz-certificate-${cleanName || "indonesia"}.png`
+          : `sertifikat-kuis-hutankita-${cleanName || "indonesia"}.png`;
         link.href = dataUrl;
         document.body.appendChild(link);
         link.click();
@@ -2401,20 +2428,84 @@ function initHkForestQuiz() {
 
   // Sinkronisasi otomatis bahasa jika pengguna mengganti ID/ENG saat kuis dibuka
   window.addEventListener("hk:languagechange", () => {
+    const isEn = isHkEnglish();
+    const activeBank = getActiveQuizBank();
+
+    // Sinkronkan seluruh soal di sessionQuestions agar jika sudah pindah bahasa, soal-soal berikutnya juga ikut bahasa aktif
+    sessionQuestions.forEach((sq) => {
+      if (typeof sq.bankIndex === "number" && activeBank[sq.bankIndex]) {
+        const src = activeBank[sq.bankIndex];
+        sq.topic = src.topic;
+        sq.question = src.question;
+        sq.explanation = src.explanation;
+        if (Array.isArray(sq.options) && Array.isArray(src.options)) {
+          sq.options.forEach((opt) => {
+            if (typeof opt.optIndex === "number" && src.options[opt.optIndex]) {
+              opt.text = src.options[opt.optIndex].text;
+            }
+          });
+        }
+      }
+    });
+
     if (activeAreaEl && !activeAreaEl.hidden && activeAreaEl.style.display !== "none") {
-      const activeBank = getActiveQuizBank();
-      if (sessionQuestions[currentQuestionIndex]) {
-        // Cocokkan soal ke bahasa baru berdasarkan indeks atau topik
-        const newQ = activeBank.find((item) => item.topic === sessionQuestions[currentQuestionIndex].topic) || activeBank[currentQuestionIndex];
-        if (newQ) {
-          sessionQuestions[currentQuestionIndex].topic = newQ.topic;
-          sessionQuestions[currentQuestionIndex].question = newQ.question;
-          sessionQuestions[currentQuestionIndex].explanation = newQ.explanation;
-          renderCurrentQuestion();
+      const current = sessionQuestions[currentQuestionIndex];
+      const dialogTitle = document.getElementById("hkQuizDialogTitle");
+      if (dialogTitle) {
+        dialogTitle.textContent = isEn
+          ? "Rainforest Knowledge Evaluation"
+          : "Evaluasi Pemahaman Rimba Nusantara";
+      }
+      if (current) {
+        const total = sessionQuestions.length;
+        if (progressEl) {
+          progressEl.textContent = isEn
+            ? `Question ${currentQuestionIndex + 1} of ${total}  •  Correct: ${correctCount}`
+            : `Soal ${currentQuestionIndex + 1} dari ${total}  •  Benar: ${correctCount}`;
+        }
+        if (userBadgeEl) {
+          const shortName = participantName && participantName.length > 20
+            ? participantName.slice(0, 18) + "…"
+            : participantName;
+          userBadgeEl.textContent = participantName
+            ? `${isEn ? "Participant:" : "Peserta:"} ${shortName}`
+            : (isEn ? "Quiz Participant" : "Peserta Edukasi");
+          userBadgeEl.title = participantName ? `${isEn ? "Participant:" : "Peserta:"} ${participantName}` : "";
+        }
+        if (topicEl) {
+          topicEl.textContent = `${isEn ? "Topic:" : "Topik:"} ${current.topic}`;
+        }
+        questionEl.textContent = current.question;
+        const buttons = optionsEl.querySelectorAll(".hk-quiz-option-btn");
+        buttons.forEach((btn, idx) => {
+          const spans = btn.querySelectorAll("span");
+          if (spans.length >= 2 && current.options[idx]) {
+            spans[1].textContent = current.options[idx].text;
+          }
+        });
+        if (hasAnsweredCurrent && feedbackEl && feedbackStatusEl && feedbackTextEl) {
+          const wasCorrect = feedbackEl.classList.contains("is-correct");
+          feedbackStatusEl.textContent = wasCorrect
+            ? (isEn ? "Correct Answer" : "Jawaban tepat")
+            : (isEn ? "Incorrect Answer" : "Jawaban belum tepat");
+          feedbackTextEl.textContent = current.explanation;
+        }
+        if (nextLabel) {
+          nextLabel.textContent =
+            currentQuestionIndex === total - 1
+              ? (isEn ? "Finish & Submit Quiz" : "Selesaikan & Submit Kuis")
+              : (isEn ? "Next Question" : "Soal berikutnya");
         }
       }
     } else if (summaryEl && !summaryEl.hidden && summaryEl.style.display !== "none") {
       showQuizSummary();
+    } else {
+      setQuizStage("intro");
+      if (nameErrorEl && !nameErrorEl.hidden && nameErrorEl.style.display !== "none") {
+        nameErrorEl.textContent = isEn
+          ? "Please enter your full name (at least 2 letters) before starting."
+          : "Silakan masukkan nama lengkap Anda (minimal 2 huruf) terlebih dahulu.";
+      }
     }
   });
 

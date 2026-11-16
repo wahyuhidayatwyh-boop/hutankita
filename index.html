@@ -37,11 +37,11 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
 
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=20261116b">
   <!-- HK-PATCH: Stylesheet tambahan untuk bagian Tentang, Kontak, dan fitur baru -->
-  <link rel="stylesheet" href="css/tambahan.css">
+  <link rel="stylesheet" href="css/tambahan.css?v=20261116b">
   <!-- HK-PATCH: Engine Dwibahasa (ID / ENG) dimuat di awal agar terjemahan siap seketika -->
-  <script src="js/i18n.js"></script>
+  <script src="js/i18n.js?v=20261116b"></script>
 </head>
 
 <body class="is-preloading">
@@ -1012,6 +1012,7 @@
 
                 <!-- 3. WhatsApp Siaga Posko -->
                 <a href="https://wa.me/6283843653251?text=Halo%20Posko%20HutanKita%2C%20saya%20ingin%20melaporkan%20kejadian%20kebakaran%20hutan"
+                  data-i18n-href="wa_report_href"
                   target="_blank" rel="noopener noreferrer" class="floating-capsule-item item-link"
                   title="Chat WhatsApp Posko HutanKita" data-i18n-title="map_wa_title">
                   <span class="capsule-sub-label" data-i18n="ref_wa_label">WHATSAPP OFFICIAL</span>
@@ -1051,6 +1052,7 @@
                 <div class="reference-hotline-grid">
                   <!-- 1. WhatsApp Official -->
                   <a href="https://wa.me/6283843653251?text=Halo%20Posko%20HutanKita%2C%20saya%20ingin%20melaporkan%20kejadian%20kebakaran%20hutan"
+                    data-i18n-href="wa_report_href"
                     target="_blank" rel="noopener noreferrer" class="ref-contact-col"
                     title="WhatsApp Posko HutanKita (0838-4365-3251)" data-i18n-title="ref_wa_title">
                     <div class="ref-contact-icon">
@@ -1344,6 +1346,7 @@
           </div>
           <div class="hotline-row-actions">
             <a href="https://wa.me/6283843653251?text=Halo%20Posko%20HutanKita%2C%20saya%20ingin%20lapor%20karhutla"
+              data-i18n-href="wa_report_short_href"
               target="_blank" rel="noopener noreferrer" class="btn-row-wa">WhatsApp</a>
             <a href="tel:083843653251" class="btn-row-call">Telepon</a>
           </div>
@@ -1406,8 +1409,8 @@
         <div id="hkQuizIntroArea" class="hk-quiz-intro-area">
           <div class="hk-quiz-intro-card">
             <div class="hk-form-field">
-              <label for="hkQuizStartName" class="hk-form-label" data-i18n="quiz_start_name_label">
-                Nama Lengkap Peserta <span class="hk-form-required" style="color: #34d399;">*</span>
+              <label for="hkQuizStartName" class="hk-form-label">
+                <span data-i18n="quiz_start_name_label">Nama Lengkap Peserta</span> <span class="hk-form-required" style="color: #34d399;">*</span>
               </label>
               <input type="text" id="hkQuizStartName" class="hk-input" maxlength="48"
                 placeholder="Ketik nama lengkap Anda (contoh: Wahyu Hidayat)" data-i18n-placeholder="quiz_start_name_placeholder" autocomplete="name" required>
@@ -1643,8 +1646,9 @@
 
   <!-- Floating WhatsApp Quick Action Button (Fixed di Kanan Bawah Layar Desktop & Mobile) -->
   <a href="https://wa.me/6283843653251?text=Halo%20Posko%20HutanKita%2C%20saya%20ingin%20melaporkan%20kejadian%20kebakaran%20hutan"
+    data-i18n-href="wa_report_href"
     target="_blank" rel="noopener noreferrer" class="ref-floating-wa-btn" title="Chat WhatsApp Posko HutanKita"
-    aria-label="WhatsApp Posko">
+    data-i18n-title="map_wa_title" aria-label="WhatsApp Posko" data-i18n-aria="wa_float_aria">
     <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
       <path
         d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z" />
@@ -1709,23 +1713,16 @@
       </div>
       <span class="app-nav-text" data-i18n="nav_map">Titik Api</span>
     </a>
-    <div class="app-nav-lang-item">
-      <div class="hk-lang-switcher" role="group" aria-label="Bahasa">
-        <button type="button" class="hk-lang-btn is-active" data-lang="id" aria-pressed="true">ID</button>
-        <span class="hk-lang-divider">/</span>
-        <button type="button" class="hk-lang-btn" data-lang="en" aria-pressed="false">EN</button>
-      </div>
-    </div>
   </nav>
 
   <!-- Toast Notification Container -->
   <div class="site-toast" id="siteToast"></div>
 
   <!-- HK-PATCH: Data 150 titik panas tersinkronisasi dimuat sebelum script utama -->
-  <script src="js/firms-hotspots-data.js" defer></script>
-  <script src="js/script.js" defer></script>
+  <script src="js/firms-hotspots-data.js?v=20261116b" defer></script>
+  <script src="js/script.js?v=20261116b" defer></script>
   <!-- HK-PATCH: Script tambahan untuk audio video, pop-up kuis 15 soal, dan 2 sertifikat resmi -->
-  <script src="js/tambahan.js" defer></script>
+  <script src="js/tambahan.js?v=20261116b" defer></script>
 </body>
 
 </html>
