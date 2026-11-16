@@ -17,8 +17,9 @@ Melalui pendekatan visual interaktif berbasis web murni tanpa backend dan tanpa 
 5. **Peta Interaktif Titik Panas Indonesia (`#peta-titik-api`)**: Peta berbasis Leaflet yang menampilkan sebaran titik panas dengan penyaringan berdasarkan wilayah kepulauan dan tingkat kepercayaan, rincian koordinat, serta pintasan pelaporan WhatsApp.
 6. **Direktori Kontak Darurat Karhutla (`#kontak-darurat`)**: Daftar nomor telepon posko darurat kebakaran hutan dan penegakan hukum lingkungan yang dapat disalin atau dihubungi langsung.
 7. **Pencarian Materi Cepat**: Fitur pencarian langsung di bilah navigasi untuk menemukan topik anatomi pohon, regulasi hukum, maupun bagian halaman.
-8. **Pop-up Kuis Ekosistem 15 Soal dan Sertifikat Evaluasi (`#hkQuizDialog`)**: Kuis interaktif 15 soal berdasarkan materi website dengan pengacakan soal dan pembuatan otomatis Sertifikat & Badge Capaian Kuis beresolusi tinggi (`1400x1000` piksel).
+8. **Pop-up Kuis Ekosistem 15 Soal dan Sertifikat Evaluasi (`#hkQuizDialog`)**: Kuis interaktif 15 soal berdasarkan materi website dengan alur pendaftaran nama bertahap, petunjuk pengerjaan, pengacakan soal, dan pembuatan otomatis Sertifikat & Badge Capaian Kuis beresolusi tinggi (`1400x1000` piksel) bertanda tangan Founder HutanKita.
 9. **Pop-up Sertifikat dan Badge Ikrar Pelestarian Hutan (`#hkPledgeDialog`)**: Formulir komitmen pelestarian hutan yang disimpan di `localStorage` dan menghasilkan Sertifikat & Badge Ikrar resmi bertanda tangan Founder HutanKita dalam format PNG (`1400x1000` piksel).
+10. **Sistem Dwibahasa Penuh (Indonesian / English i18n)**: Pengalih bahasa instan (`ID` / `EN`) di bilah navigasi desktop dan mobile yang menerjemahkan 100% seluruh konten website secara reaktif tanpa reload, mencakup materi edukasi 3D, pasal undang-undang kehutanan, 15 soal kuis beserta pilihan dan pembahasannya, hingga teks pada kedua Sertifikat & Badge kanvas resmi.
 
 ## Teknologi dan Versi Pustaka
 
@@ -150,7 +151,7 @@ Seluruh pustaka pihak ketiga bersifat gratis dan sumber terbuka (open-source), s
 | `Leaflet 1.9.4` | Pustaka Peta Interaktif | https://leafletjs.com (unpkg) | BSD-2-Clause License |
 | `Outfit Font` | Tipografi | https://fonts.google.com/specimen/Outfit | SIL Open Font License (OFL) |
 | `Esri World Imagery` | Tile Peta Dasar | Esri, Maxar, Earthstar Geographics, GIS User Community | Ketentuan Layanan Esri ArcGIS Online |
-| `assets/videos/hero-video.mp4` | Video Latar Hero | Youtube (https://youtu.be/C_ZyYpyZ6EI?si=JnbSr0rKEdqIyOMe) | Penggunaan Edukasi Non-Komersial |
+| `assets/videos/hero-video.mp4` | Video Latar Hero | Pinterest (https://id.pinterest.com) | Penggunaan Edukasi Non-Komersial |
 | `assets/videos/footer-video.mp4` | Video Bagian Ajakan | Pinterest (https://id.pinterest.com) | Penggunaan Edukasi Non-Komersial |
 | `assets/images/logo-tab.webp` | Ikon Tab Peramban | Pinterest (https://id.pinterest.com) | Penggunaan Edukasi Non-Komersial |
 | `assets/images/peta.webp` | Tekstur Peta Relief 3D | Pinterest (https://id.pinterest.com) | Penggunaan Edukasi Non-Komersial |

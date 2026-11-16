@@ -322,21 +322,41 @@ function initHkVideoAudioFix() {
  * UTILITAS PENGGAMBARAN SERTIFIKAT & BADGE RESMI BERDOMINASI PUTIH (1400 x 1000 px)
  * Digunakan bersama oleh Sertifikat Ikrar (#hkPledgeCanvas) dan Sertifikat Kuis (#hkQuizCertCanvas).
  */
+function isHkEnglish() {
+  return typeof window.getHkLanguage === "function" && window.getHkLanguage() === "en";
+}
+
 function formatIndonesianDate(dateObj) {
-  const months = [
-    "Januari",
-    "Februari",
-    "Maret",
-    "April",
-    "Mei",
-    "Juni",
-    "Juli",
-    "Agustus",
-    "September",
-    "Oktober",
-    "November",
-    "Desember"
-  ];
+  const isEn = isHkEnglish();
+  const months = isEn
+    ? [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+      ]
+    : [
+        "Januari",
+        "Februari",
+        "Maret",
+        "April",
+        "Mei",
+        "Juni",
+        "Juli",
+        "Agustus",
+        "September",
+        "Oktober",
+        "November",
+        "Desember"
+      ];
   const d = dateObj.getDate();
   const m = months[dateObj.getMonth()];
   const y = dateObj.getFullYear();
@@ -479,10 +499,11 @@ function drawWhiteCertificateBase(ctx, width, height, config) {
   const rightColX = width - 270;
 
   // Kolom Kiri: Tanggal & Nomor Sertifikat
+  const isEnBase = isHkEnglish();
   ctx.textAlign = "center";
   ctx.font = "500 17px 'Outfit', sans-serif";
   ctx.fillStyle = "#475569";
-  ctx.fillText("Diterbitkan di Indonesia pada:", leftColX, footerBaseY - 48);
+  ctx.fillText(isEnBase ? "Issued in Indonesia on:" : "Diterbitkan di Indonesia pada:", leftColX, footerBaseY - 48);
 
   ctx.font = "700 22px 'Outfit', sans-serif";
   ctx.fillStyle = "#0f172a";
@@ -501,7 +522,7 @@ function drawWhiteCertificateBase(ctx, width, height, config) {
 
   ctx.font = "400 14px 'Outfit', sans-serif";
   ctx.fillStyle = "#64748b";
-  ctx.fillText("Dokumen Digital Terverifikasi HutanKita", leftColX, footerBaseY + 60);
+  ctx.fillText(isEnBase ? "HutanKita Verified Digital Document" : "Dokumen Digital Terverifikasi HutanKita", leftColX, footerBaseY + 60);
 
   // Kolom Tengah: Lencana / Segel Badge Resmi (Rosette Emblem)
   drawOfficialSealBadge(
@@ -517,7 +538,7 @@ function drawWhiteCertificateBase(ctx, width, height, config) {
   ctx.textAlign = "center";
   ctx.font = "500 17px 'Outfit', sans-serif";
   ctx.fillStyle = "#475569";
-  ctx.fillText("Disahkan oleh,", rightColX, footerBaseY - 82);
+  ctx.fillText(isEnBase ? "Authorized by," : "Disahkan oleh,", rightColX, footerBaseY - 82);
 
   // Gambar Tanda Tangan Asli jika sudah siap
   if (hkFounderSigLoaded && hkFounderSigImage) {
@@ -661,7 +682,11 @@ function initHkPledgeCardDialog() {
   function getSelectedPledgeText() {
     if (!choicesWrap) return "";
     const checked = choicesWrap.querySelector('input[name="hkPledgeOption"]:checked');
-    return checked ? checked.value : "";
+    if (!checked) return "";
+    if (isHkEnglish()) {
+      return checked.getAttribute("data-en-value") || checked.value;
+    }
+    return checked.value;
   }
 
   function loadStoredPledge() {
@@ -676,7 +701,8 @@ function initHkPledgeCardDialog() {
 
   function saveStoredPledge() {
     const nameVal = (nameInput ? nameInput.value : "").trim();
-    const pledgeVal = getSelectedPledgeText();
+    const checked = choicesWrap ? choicesWrap.querySelector('input[name="hkPledgeOption"]:checked') : null;
+    const pledgeVal = checked ? checked.value : "";
     const payload = {
       name: nameVal,
       pledge: pledgeVal,
@@ -685,7 +711,9 @@ function initHkPledgeCardDialog() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
       if (savedNote) {
-        savedNote.textContent = "Tersimpan otomatis di peramban perangkat ini.";
+        savedNote.textContent = isHkEnglish()
+          ? "Automatically saved in this device's browser."
+          : "Tersimpan otomatis di peramban perangkat ini.";
       }
     } catch (_err) {
       // Abaikan jika penyimpanan lokal dibatasi
@@ -697,13 +725,16 @@ function initHkPledgeCardDialog() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const isEn = isHkEnglish();
     const width = canvas.width;
     const height = canvas.height;
     const rawName = (nameInput ? nameInput.value : "").trim();
-    const displayName = rawName || "Sahabat Rimba Indonesia";
+    const displayName = rawName || (isEn ? "Indonesian Rainforest Guardian" : "Sahabat Rimba Indonesia");
     const pledgeText =
       getSelectedPledgeText() ||
-      "Tidak membuka lahan dengan membakar serta tidak membuang bara api di area vegetasi kering.";
+      (isEn
+        ? "Refrain from land clearing by burning and avoid discarding embers in dry vegetation areas."
+        : "Tidak membuka lahan dengan membakar serta tidak membuang bara api di area vegetasi kering.");
     const dateStr = formatIndonesianDate(new Date());
 
     // Buat nomor seri deterministik dari nama
@@ -713,12 +744,16 @@ function initHkPledgeCardDialog() {
     }
 
     drawWhiteCertificateBase(ctx, width, height, {
-      topPillText: "HUTANKITA INDONESIA  •  GERAKAN PELESTARIAN RIMBA NUSANTARA",
-      mainTitle: "SERTIFIKAT & BADGE IKRAR",
-      subTitle: "KOMITMEN AKSI NYATA PELESTARIAN HUTAN HUJAN TROPIS INDONESIA",
+      topPillText: isEn
+        ? "HUTANKITA INDONESIA  •  ARCHIPELAGO RAINFOREST CONSERVATION MOVEMENT"
+        : "HUTANKITA INDONESIA  •  GERAKAN PELESTARIAN RIMBA NUSANTARA",
+      mainTitle: isEn ? "PLEDGE CERTIFICATE & BADGE" : "SERTIFIKAT & BADGE IKRAR",
+      subTitle: isEn
+        ? "TANGIBLE ACTION COMMITMENT TO PRESERVING INDONESIA'S TROPICAL RAINFORESTS"
+        : "KOMITMEN AKSI NYATA PELESTARIAN HUTAN HUJAN TROPIS INDONESIA",
       dateStr,
-      serialId: `No. Registrasi: HK-IKRAR-2026-${hash}`,
-      badgeTopText: "PENJAGA RIMBA",
+      serialId: isEn ? `Registration No.: HK-PLEDGE-2026-${hash}` : `No. Registrasi: HK-IKRAR-2026-${hash}`,
+      badgeTopText: isEn ? "GUARDIAN" : "PENJAGA RIMBA",
       badgeCenterMain: "VERIFIED",
       badgeCenterSub: "HUTANKITA"
     });
@@ -731,7 +766,7 @@ function initHkPledgeCardDialog() {
     // Pengantar nama penerima
     ctx.font = "400 21px 'Outfit', sans-serif";
     ctx.fillStyle = "#334155";
-    ctx.fillText("Sertifikat kehormatan ini diberikan dengan bangga kepada:", centerX, 294);
+    ctx.fillText(isEn ? "This certificate of honor is proudly presented to:" : "Sertifikat kehormatan ini diberikan dengan bangga kepada:", centerX, 294);
 
     // Nama lengkap penerima
     ctx.font = "800 48px 'Outfit', sans-serif";
@@ -752,7 +787,9 @@ function initHkPledgeCardDialog() {
     ctx.font = "500 20px 'Outfit', sans-serif";
     ctx.fillStyle = "#334155";
     ctx.fillText(
-      "Atas kesungguhan mengikrarkan komitmen nyata sebagai Penjaga Hutan Tropis Nusantara:",
+      isEn
+        ? "For sincerely pledging a tangible commitment as a Guardian of the Archipelago's Tropical Rainforest:"
+        : "Atas kesungguhan mengikrarkan komitmen nyata sebagai Penjaga Hutan Tropis Nusantara:",
       centerX,
       436
     );
@@ -888,15 +925,27 @@ function initHkPledgeCardDialog() {
         link.click();
         document.body.removeChild(link);
         if (typeof window.showToast === "function") {
-          window.showToast("Sertifikat & Badge Ikrar (PNG) berhasil diunduh.");
+          window.showToast(
+            isHkEnglish()
+              ? "Pledge Certificate & Badge (PNG) downloaded successfully."
+              : "Sertifikat & Badge Ikrar (PNG) berhasil diunduh."
+          );
         }
       } catch (_err) {
         if (typeof window.showToast === "function") {
-          window.showToast("Gagal mengunduh sertifikat pada peramban ini.");
+          window.showToast(
+            isHkEnglish()
+              ? "Failed to download certificate in this browser."
+              : "Gagal mengunduh sertifikat pada peramban ini."
+          );
         }
       }
     });
   }
+
+  window.addEventListener("hk:languagechange", () => {
+    drawPledgeCertificate();
+  });
 }
 
 /**
@@ -910,7 +959,15 @@ function initHkForestQuiz() {
   const closeTopBtn = document.getElementById("hkQuizCloseTopBtn");
   const closeBottomBtn = document.getElementById("hkQuizCloseBottomBtn");
 
+  // Tahap 1: Pendaftaran Nama & Petunjuk Kuis
+  const introAreaEl = document.getElementById("hkQuizIntroArea");
+  const startNameInput = document.getElementById("hkQuizStartName");
+  const nameErrorEl = document.getElementById("hkQuizNameError");
+  const startBtn = document.getElementById("hkQuizStartBtn");
+
+  // Tahap 2: Soal Aktif Kuis
   const activeAreaEl = document.getElementById("hkQuizActiveArea");
+  const userBadgeEl = document.getElementById("hkQuizUserBadge");
   const progressEl = document.getElementById("hkQuizProgress");
   const topicEl = document.getElementById("hkQuizTopic");
   const questionEl = document.getElementById("hkQuizQuestion");
@@ -921,6 +978,7 @@ function initHkForestQuiz() {
   const nextBtn = document.getElementById("hkQuizNextBtn");
   const nextLabel = document.getElementById("hkQuizNextLabel");
 
+  // Tahap 3: Ringkasan Nilai & Sertifikat
   const summaryEl = document.getElementById("hkQuizSummary");
   const scoreTitleEl = document.getElementById("hkQuizScoreTitle");
   const scoreDescEl = document.getElementById("hkQuizScoreDesc");
@@ -931,8 +989,7 @@ function initHkForestQuiz() {
 
   if (!questionEl || !optionsEl) return;
 
-  // 15 Soal Kuis yang seluruhnya diambil dari materi di halaman website HutanKita
-  const QUIZ_BANK = [
+  const QUIZ_BANK_ID = [
     {
       topic: "Ekosistem Hutan Indonesia",
       question:
@@ -1031,309 +1088,683 @@ function initHkForestQuiz() {
         }
       ],
       explanation:
-        "Pada detail Dahan & Cabang dijelaskan bahwa percabangan membentangkan tajuk ke arah cahaya matahari sekaligus menyediakan koridor arboreal dan tempat bersarang bagi satwa kanopi."
+        "Dahan yang kokoh di ketinggian 40-50 meter menopang tajuk, menampung ribuan tanaman epifit, dan menjadi koridor perlintasan satwa liar arboreal tanpa harus turun ke lantai rimba."
     },
     {
       topic: "Anatomi: Batang Kayu",
       question:
-        "Bagaimana peran jaringan pembuluh xilem, floem, dan biomassa pada Batang Kayu pohon hutan tropis?",
+        "Apa peran fisiologis ganda dari jaringan xilem dan floem pada Batang pohon purba sebagaimana dimodelkan di HutanKita?",
       options: [
         {
-          text: "Xilem mengangkut air dan mineral dari akar ke tajuk, floem mengedarkan hasil fotosintesis, serta kayu menyimpan cadangan karbon (carbon sink) selama ratusan tahun.",
+          text: "Menyalurkan ratusan liter air dan mineral tanah ke tajuk teratas (xilem) serta mendistribusikan nutrisi hasil fotosintesis ke seluruh pohon (floem).",
           isCorrect: true
         },
         {
-          text: "Xilem menangkap serangga penyerbuk sedangkan floem memancarkan cahaya spora di malam hari.",
+          text: "Menghasilkan minyak bumi dan menyedot habis seluruh air di danau sekitar.",
           isCorrect: false
         },
         {
-          text: "Batang kayu berfungsi melepaskan gas karbon dioksida secara masif setiap kali turun hujan.",
+          text: "Menyimpan abu vulkanik serta menangkal tetesan hujan agar tidak jatuh ke bumi.",
           isCorrect: false
         },
         {
-          text: "Jaringan kambium hanya berfungsi menggugurkan akar agar pohon mudah berpindah tempat.",
+          text: "Memancarkan gas metana untuk memanaskan suhu permukaan hutan secara berkala.",
           isCorrect: false
         }
       ],
       explanation:
-        "Batang kayu merupakan pilar struktural dengan jaringan xilem dan floem untuk distribusi hara serta gudang penyimpanan biomassa karbon padat (carbon sink)."
+        "Batang pohon emergent bertindak sebagai pipa vaskular raksasa: xilem mengalirkan air dan mineral ke atas, sementara floem mengedarkan glukosa hasil fotosintesis ke seluruh jaringan."
     },
     {
       topic: "Anatomi: Akar Banir",
       question:
-        "Mengapa pohon raksasa di hutan hujan tropis mengembangkan Akar Banir (buttress roots) yang melebar di pangkal batang beserta jaringan mikoriza?",
+        "Mengapa Akar Banir (buttress root) yang memipih melebar sangat vital bagi kelangsungan hidup pohon raksasa di lantai hutan tropis?",
       options: [
         {
-          text: "Menjadi jangkar mekanis penopang pohon raksasa pada tanah tropis yang lapisan haranya dangkal, mencegah longsor lereng, dan bersimbiosis dengan jamur mikoriza.",
+          text: "Menjadi penopang mekanis horizontal di atas lapisan tanah humus dangkal agar pohon tidak tumbang diterpa angin kencang sekaligus mengunci erosi tanah tebing.",
           isCorrect: true
         },
         {
-          text: "Untuk mengapungkan seluruh batang pohon ke permukaan laut saat terjadi pasang naik.",
+          text: "Berfungsi menyerap sinar matahari di malam hari untuk fotosintesis cadangan.",
           isCorrect: false
         },
         {
-          text: "Agar daun tidak perlu melakukan fotosintesis pada siang hari.",
+          text: "Menghancurkan batu bara di bawah tanah untuk diubah menjadi gas beracun.",
           isCorrect: false
         },
         {
-          text: "Untuk menghalangi air hujan meresap ke dalam cadangan air tanah.",
+          text: "Menggantikan fungsi daun dalam menghasilkan bunga dan buah musiman.",
           isCorrect: false
         }
       ],
       explanation:
-        "Akar banir memperluas bidang tumpuan mekanis pohon raksasa di tanah tropis, mengikat struktur tanah agar tidak longsor/erosi, dan bersimbiosis dengan mikoriza untuk menyerap hara."
+        "Tanah hutan hujan tropis umumnya dangkal dan tipis. Akar banir yang melebar hingga radius 5 meter memberikan kestabilan mekanis ekstra terhadap terpaan angin badai tropis."
     },
     {
-      topic: "Spesies Pohon Purba",
+      topic: "Krisis Pembalakan Liar",
       question:
-        "Pohon endemik Kalimantan apakah yang dijuluki sebagai 'Kayu Besi' (Eusideroxylon zwageri) karena ketahanan kayunya mampu mencapai ratusan tahun dan menjadi sasaran pembalakan liar?",
+        "Apa dampak bencana hidrologis paling berbahaya akibat penebangan liar pohon berukuran besar di hutan dataran tinggi Indonesia?",
       options: [
         {
-          text: "Pohon Ulin (bersama pohon Meranti dan Damar).",
+          text: "Hilangnya sistem kanopi penahan hujan dan perakaran pengikat tanah, sehingga memicu erosi masif, longsor tebing, dan banjir bandang di hilir.",
           isCorrect: true
         },
         {
-          text: "Rumput teki pantai dan semak belukar semusim.",
+          text: "Meningkatnya produksi air mineral kemasan secara alami di puncak bukit.",
           isCorrect: false
         },
         {
-          text: "Tanaman jagung hibrida dataran rendah.",
+          text: "Menurunnya suhu bumi secara drastis hingga terjadi hujan salju di khatulistiwa.",
           isCorrect: false
         },
         {
-          text: "Lumut kerak kutub utara (Lichenes).",
+          text: "Menghentikan seluruh gempa tektonik di lempeng samudra nusantara.",
           isCorrect: false
         }
       ],
       explanation:
-        "Pada materi ancaman pembalakan hutan dan basis data HutanKita, Pohon Ulin (Eusideroxylon zwageri) dikenal sebagai kayu besi Kalimantan yang tahan ratusan tahun."
+        "Pembalakan liar melenyapkan tajuk penyerap energi kinetik hujan dan akar pengikat tanah, sehingga air hujan langsung menggerus lapisan tanah permukaan dan memicu banjir bandang."
     },
     {
       topic: "Krisis Kebakaran Gambut",
       question:
-        "Mengapa Kebakaran Gambut (Karhutla) yang dijelaskan pada bagian Ancaman Perusakan Hutan sangat berbahaya bagi ekosistem dan iklim?",
+        "Mengapa kebakaran hutan dan lahan gambut (karhutla) sangat sulit dipadamkan dan berdampak luas terhadap krisis iklim global?",
       options: [
         {
-          text: "Menyulut bara bawah tanah kubah gambut hingga kedalaman belasan meter, memicu kabut asap beracun lintas batas, dan melepaskan megaton gas karbon.",
+          text: "Api merambat di bawah permukaan tanah (smoldering) hingga kedalaman belasan meter, melepaskan megaton karbon purba dan menghasilkan kabut asap beracun.",
           isCorrect: true
         },
         {
-          text: "Hanya membakar lapisan embun pagi tanpa menghasilkan asap maupun emisi karbon.",
+          text: "Karena air tidak dapat membasahi daun pohon cemara di rawa pantai.",
           isCorrect: false
         },
         {
-          text: "Membuat permukaan air tanah di kubah gambut langsung membeku menjadi es.",
+          text: "Karena lahan gambut tersusun atas bongkahan es abadi yang mudah terbakar.",
           isCorrect: false
         },
         {
-          text: "Menyuburkan kembali pohon purba secara instan dalam waktu satu jam.",
+          text: "Karena api karhutla hanya membakar oksigen tanpa meninggalkan sisa abu.",
           isCorrect: false
         }
       ],
       explanation:
-        "Kebakaran lahan gambut membakar lapisan biomassa bawah permukaan hingga belasan meter, menghancurkan plasma nutfah, memicu kabut asap lintas batas, dan melepaskan megaton karbon."
+        "Kubah gambut tersusun atas endapan biomassa purba yang tebal. Saat kemarau, api membakar lapisan bawah tanah (sub-surface) tanpa nyala terang, melepaskan simpanan karbon raksasa ke atmosfer."
     },
     {
-      topic: "Hukum: Penebangan Liar (UU P3H)",
+      topic: "Hukum: UU P3H No. 18/2013",
       question:
-        "Berdasarkan Pasal 82–84 UU No. 18 Tahun 2013 (P3H) pada kartu sanksi HutanKita, apa ancaman hukuman maksimal bagi pelaku korporasi/cukong penebangan liar (illegal logging)?",
+        "Berdasarkan UU No. 18 Tahun 2013 tentang Pencegahan dan Pemberantasan Perusakan Hutan (P3H), apa sanksi pidana terberat bagi pelaku pembalakan liar dan perambahan hutan?",
       options: [
         {
-          text: "Pidana penjara maksimal hingga 15 tahun, denda korporasi maksimal Rp 100 Miliar, serta penyitaan dan perampasan seluruh alat berat dan kayu ilegal.",
+          text: "Pidana penjara paling lama 15 tahun dan denda maksimal hingga Rp 100 miliar bagi korporasi atau cukong.",
           isCorrect: true
         },
         {
-          text: "Teguran lisan tanpa denda dan kayu hasil tebangan liar boleh tetap dijual bebas.",
+          text: "Teguran tertulis dan denda tilang sebesar Rp 50.000.",
           isCorrect: false
         },
         {
-          text: "Hanya diwajibkan membayar denda administrasi sebesar Rp 50.000.",
+          text: "Kerja sosial membersihkan halaman kantor kelurahan selama 3 hari.",
           isCorrect: false
         },
         {
-          text: "Pemberian izin konsesi tambahan di dalam kawasan taman nasional.",
+          text: "Bebas dari segala tuntutan jika kayu yang ditebang dijual ke luar negeri.",
           isCorrect: false
         }
       ],
       explanation:
-        "Pasal 82–84 UU No. 18 Tahun 2013 (P3H) menetapkan ancaman penjara 3–15 tahun, denda korporasi/cukong hingga Rp 100 Miliar, dan perampasan total alat berat serta kayu tanpa SKSHH."
+        "Pasal 82-84 UU No. 18 Tahun 2013 menetapkan ancaman kurungan penjara hingga 15 tahun dan denda hingga Rp 100 Miliar serta penyitaan seluruh armada alat berat bagi pelaku dan pemodal kejahatan hutan."
     },
     {
-      topic: "Hukum: Pembakaran Hutan (UU PPLH)",
+      topic: "Hukum: Prinsip Strict Liability",
       question:
-        "Apa sanksi bagi pelaku dan korporasi pembakar hutan/lahan menurut Pasal 108 UU No. 32 Tahun 2009 (PPLH) & UU No. 41 Tahun 1999?",
+        "Apa arti prinsip Pertanggungjawaban Mutlak (Strict Liability) dalam UU No. 32 Tahun 2009 (PPLH) terkait kebakaran hutan konsesi?",
       options: [
         {
-          text: "Penjara 3–15 tahun, denda hingga Rp 15 Miliar, pencabutan izin HGU, serta penerapan prinsip tanggung jawab mutlak (Strict Liability).",
+          text: "Perusahaan pemegang izin konsesi bertanggung jawab penuh atas setiap kebakaran di arealnya tanpa pemerintah perlu membuktikan adanya unsur kesengajaan atau kelalaian.",
           isCorrect: true
         },
         {
-          text: "Bebas dari tanggung jawab hukum apabila kebakaran terjadi pada siang hari.",
+          text: "Perusahaan dibebaskan dari segala tuntutan ganti rugi jika kebakaran terjadi di musim kemarau.",
           isCorrect: false
         },
         {
-          text: "Hanya dikenakan sanksi penundaan rapat tahunan perusahaan selama satu minggu.",
+          text: "Tanggung jawab pemadaman dilimpahkan sepenuhnya kepada satwa liar yang melintas.",
           isCorrect: false
         },
         {
-          text: "Pemberian subsidi pembukaan lahan baru dengan cara membakar kubah gambut.",
+          text: "Pemerintah wajib memberikan kompensasi dana tunai kepada perusahaan yang lahannya terbakar.",
           isCorrect: false
         }
       ],
       explanation:
-        "Pasal 108 UU PPLH mengancam pelaku pembakaran lahan dengan penjara 3–15 tahun, denda Rp 15 Miliar, pencabutan izin HGU, dan prinsip Strict Liability bagi korporasi."
+        "Prinsip Strict Liability mewajibkan perusahaan pemegang HGU bertanggung jawab mutlak membayar ganti rugi pemulihan ekologis atas kebakaran di konsesinya tanpa memandang apakah ada unsur kelalaian."
     },
     {
-      topic: "Hukum: Satwa & Flora Dilindungi",
+      topic: "Hukum: UU KSDAE No. 5/1990",
       question:
-        "Undang-undang manakah yang menjerat pelaku perburuan satwa dilindungi (Orangutan, Harimau Sumatera, Badak Jawa) dan perusakan flora langka (Rafflesia arnoldii) dengan penjara 5–10 tahun serta denda Rp 5 Miliar?",
+        "Menurut UU No. 5 Tahun 1990 (KSDAE), apa ancaman pidana bagi pelaku perburuan, penyimpanan, atau perdagangan satwa dilindungi seperti Orangutan dan Harimau Sumatera?",
       options: [
         {
-          text: "Pasal 21 & 40 UU No. 5 Tahun 1990 tentang Konservasi Sumber Daya Alam Hayati dan Ekosistemnya (KSDAE).",
+          text: "Pidana kurungan penjara maksimal 5 tahun dan denda pidana hingga ratusan juta rupiah serta kewajiban pembiayaan rehabilitasi satwa.",
           isCorrect: true
         },
         {
-          text: "Peraturan lalu lintas angkutan jalan raya perkotaan.",
+          text: "Mendapatkan izin resmi untuk memelihara satwa langka tersebut di rumah pribadi.",
           isCorrect: false
         },
         {
-          text: "Undang-undang perdagangan saham bursa efek.",
+          text: "Masa percobaan selama 1 minggu tanpa catatan kepolisian.",
           isCorrect: false
         },
         {
-          text: "Ketentuan pajak reklame pusat perbelanjaan.",
+          text: "Tidak dikenai sanksi pidana apabila satwa ditangkap di luar zona inti taman nasional.",
           isCorrect: false
         }
       ],
       explanation:
-        "Pada kartu sanksi ketiga dijelaskan bahwa Pasal 21 & 40 UU No. 5 Tahun 1990 (KSDAE) mengatur pidana 5–10 tahun penjara dan denda Rp 5 Miliar bagi perusak satwa/flora dilindungi."
+        "Pasal 21 dan 40 UU No. 5 Tahun 1990 melarang keras menangkap, melukai, membunuh, menyimpan, atau memperniagakan satwa yang dilindungi dengan ancaman pidana penjara 5 tahun dan denda."
     },
     {
-      topic: "Konservasi Satwa Endemik",
+      topic: "Aksi Lapangan: Manggala Agni",
       question:
-        "Berdasarkan dokumentasi 'Evakuasi & Pelepasliaran Orangutan' di Galeri HutanKita, mengapa Orangutan (Pongo pygmaeus & Pongo abelii) sangat krusial bagi regenerasi hutan?",
+        "Dalam Galeri Rekaman HutanKita, apa tugas utama satuan Manggala Agni dalam menjaga kawasan gambut nusantara?",
       options: [
         {
-          text: "Merupakan spesies payung penyebar biji buah hutan ke berbagai sudut kanopi sehingga membantu tumbuhnya bibit pohon baru.",
+          text: "Melakukan operasi pemadaman api bawah tanah (karhutla) menggunakan teknik injeksi air bertekanan tinggi hingga ke dalam lapisan kubah gambut.",
           isCorrect: true
         },
         {
-          text: "Karena orangutan memakan habis seluruh akar banir pohon tua setiap musim hujan.",
+          text: "Membangun pabrik kelapa sawit di tengah cagar biosfer alami.",
           isCorrect: false
         },
         {
-          text: "Karena orangutan hidup di dasar sungai untuk memfilter pasir kuarsa.",
+          text: "Menjual kayu tebangan hutan lindung ke pasar gelap internasional.",
           isCorrect: false
         },
         {
-          text: "Karena orangutan hanya memakan batu kapur di lereng gunung berapi.",
+          text: "Mengeringkan kanal air gambut agar lahan mudah dijadikan tambang terbuka.",
           isCorrect: false
         }
       ],
       explanation:
-        "Orangutan menjelajah tajuk hutan untuk memakan buah dan menyebarkan bijinya bersama kotoran organik, sehingga menjadi agen regenerasi alami vegetasi hutan hujan tropis."
+        "Manggala Agni merupakan brigade pengendalian kebakaran hutan dan lahan KLHK yang terlatih memadamkan bara gambut bawah tanah dengan penyuntikan air ke dalam stratum gambut."
     },
     {
-      topic: "Operasi Pemadaman Karhutla",
+      topic: "Restorasi Flora Endemik",
       question:
-        "Satuan khusus di bawah Kementerian LHK yang bertugas memadamkan bara api bawah tanah di kubah gambut dengan teknik penyuntikan air bertekanan tinggi hingga kedalaman 4–8 meter adalah...",
+        "Mengapa penanaman kembali pohon endemik seperti Ulin dan Meranti purba sangat diprioritaskan dalam program restorasi HutanKita?",
       options: [
         {
-          text: "Manggala Agni KLHK.",
+          text: "Pohon endemik memiliki daya tahan tinggi di tanah miskin hara, mengunci cadangan karbon jangka panjang, dan memulihkan rantai makanan ekosistem alami.",
           isCorrect: true
         },
         {
-          text: "Petugas administrasi perpustakaan kota.",
+          text: "Karena pohon tersebut dapat tumbuh dewasa dan berbuah lebat dalam waktu 24 jam.",
           isCorrect: false
         },
         {
-          text: "Regu pengawas tiket pelabuhan penumpang.",
+          text: "Karena pohon tersebut dapat mengeluarkan aroma pewangi ruangan sintetis ke udara bebas.",
           isCorrect: false
         },
         {
-          text: "Operator menara telekomunikasi seluler.",
+          text: "Karena pohon tersebut tidak memerlukan air sama sekali sepanjang hidupnya.",
           isCorrect: false
         }
       ],
       explanation:
-        "Pada Galeri Aksi dan Layanan Siaga Karhutla dijelaskan bahwa Manggala Agni KLHK adalah satuan khusus pemadam kebakaran hutan dan bara gambut bawah tanah."
+        "Pohon endemik bernilai konservasi tinggi (HCV) seperti Meranti dan Ulin merupakan pilar struktural kanopi klimaks yang mengembalikan fungsi ekologis hutan secara utuh dan berkelanjutan."
     },
     {
-      topic: "Pemantauan Satelit Titik Panas",
+      topic: "Pemantauan Satelit NASA FIRMS",
       question:
-        "Sensor satelit apa yang digunakan pada sistem NASA FIRMS di Peta Titik Api HutanKita untuk mendeteksi anomali suhu ekstrem dan mengukur radiasi panas (Fire Radiative Power / FRP dalam Megawatt)?",
+        "Bagaimana teknologi satelit NASA FIRMS (VIIRS S-NPP 375m) pada peta interaktif HutanKita membantu pencegahan kebakaran hutan?",
       options: [
         {
-          text: "Sensor satelit VIIRS S-NPP (resolusi 375m) dan MODIS yang terintegrasi ke sistem pemantauan titik panas.",
+          text: "Mendeteksi anomali suhu termal (thermal anomalies) dan Fire Radiative Power (FRP) secara cepat untuk memetakan titik api sebelum meluas menjadi kobaran besar.",
           isCorrect: true
         },
         {
-          text: "Kamera analog bawah laut tanpa sensor inframerah termal.",
+          text: "Menyiram air langsung dari orbit luar angkasa ke permukaan hutan secara otomatis.",
           isCorrect: false
         },
         {
-          text: "Balon udara mainan jarak 10 meter dari permukaan tanah.",
+          text: "Menyaring sinyal radio gelombang pendek untuk mendengarkan suara satwa di kanopi.",
           isCorrect: false
         },
         {
-          text: "Sonar akustik khusus pemetaan palung laut dalam.",
+          text: "Mengubah arah angin topan agar menjauh dari kepulauan nusantara.",
           isCorrect: false
         }
       ],
       explanation:
-        "Peta Titik Api HutanKita menampilkan data deteksi satelit VIIRS SNPP (375m) dari NASA FIRMS lengkap dengan nilai radiasi panas (FRP dalam satuan MW)."
+        "Sensor VIIRS S-NPP pada satelit cuaca kutub mendeteksi titik radiasi panas permukaan 375m, memberikan koordinat akurat dan tingkat keyakinan (confidence) bagi posko karhutla."
     },
     {
-      topic: "Tanggap Darurat Karhutla",
+      topic: "Aksi Nyata & Ikrar HutanKita",
       question:
-        "Manakah daftar nomor kontak darurat resmi pada bagian Layanan Siaga Karhutla HutanKita yang tepat untuk melaporkan kebakaran hutan, bencana kabut asap, dan kejahatan kehutanan?",
+        "Apa peran paling nyata yang dapat diambil oleh generasi muda melalui platform HutanKita untuk mendukung pelestarian rimba tropis?",
       options: [
         {
-          text: "Damkar 113, Pusdalops BPBD 112, Penegakan Hukum Polri & Gakkum 110, serta WhatsApp Posko HutanKita 0838-4365-3251.",
+          text: "Mempelajari literasi botani dan hukum kehutanan, menyatakan komitmen Ikrar Rimba, serta tanggap melaporkan titik api melalui kontak darurat resmi.",
           isCorrect: true
         },
         {
-          text: "Hanya nomor ekstensi internal kantor pos kecamatan.",
+          text: "Membeli produk perabot kayu tanpa sertifikat verifikasi legalitas kayu (SVLK).",
           isCorrect: false
         },
         {
-          text: "Layanan pesan makanan cepat saji 24 jam.",
+          text: "Membuang puntung rokok sembarangan di areal semak belukar yang mengering saat kemarau.",
           isCorrect: false
         },
         {
-          text: "Nomor informasi jadwal keberangkatan kereta api antarkota.",
+          text: "Mengabaikan informasi kebakaran lahan dan membiarkan bara api merembet ke cagar alam.",
           isCorrect: false
         }
       ],
       explanation:
-        "Bagian Kontak Darurat Karhutla mencantumkan Damkar Siaga 113, BPBD Bencana 112, Gakkum & Polri 110, serta WhatsApp Official Posko HutanKita +62 838-4365-3251."
+        "Aksi pelestarian dimulai dari literasi kesadaran, komitmen moral menjaga alam, penolakan hasil perusakan hutan, dan tindakan proaktif memanfaatkan nomor siaga pelaporan posko resmi."
     }
   ];
 
-  function shuffleArray(items) {
-    const arr = [...items];
-    for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      const tmp = arr[i];
-      arr[i] = arr[j];
-      arr[j] = tmp;
+  const QUIZ_BANK_EN = [
+    {
+      topic: "Indonesian Forest Ecosystem",
+      question:
+        "Based on the core statistics in HutanKita's Education section, what is the extent of Indonesia's tropical rainforest cover acting as the planet's climate fortress?",
+      options: [
+        {
+          text: "Over 120 million hectares, harboring 30,000+ tropical flora species and representing 10% of the world's tropical forests.",
+          isCorrect: true
+        },
+        {
+          text: "Around 15 million hectares located entirely in Java and Bali.",
+          isCorrect: false
+        },
+        {
+          text: "Less than 5 million hectares consisting solely of mountain pine.",
+          isCorrect: false
+        },
+        {
+          text: "Exactly 500 million hectares of dry savanna without canopies.",
+          isCorrect: false
+        }
+      ],
+      explanation:
+        "The HutanKita Education section highlights that Indonesia's tropical rainforest spans 120+ million hectares (10% of global tropical forests) and shelters 30,000+ plant species."
+    },
+    {
+      topic: "Giant Tree Structures",
+      question:
+        "What height can emergent trees reach in Indonesian tropical rainforests as described in the 3D Tree Anatomy section?",
+      options: [
+        {
+          text: "Soaring over 60 meters high, breaking through the upper canopy layer.",
+          isCorrect: true
+        },
+        {
+          text: "A maximum of 4 to 6 meters like understory shrubs.",
+          isCorrect: false
+        },
+        {
+          text: "An average of 1.5 meters to avoid valley winds.",
+          isCorrect: false
+        },
+        {
+          text: "Never exceeding 10 meters due to equatorial sunlight limits.",
+          isCorrect: false
+        }
+      ],
+      explanation:
+        "The Wonders of Giant Tree Structures section specifies that emergent trees soar over 60 meters high."
+    },
+    {
+      topic: "Anatomy: Leaves & Canopy",
+      question:
+        "What is the primary ecological function of the Leaves & Canopy layer in HutanKita's 3D Tree Anatomy model?",
+      options: [
+        {
+          text: "Conducting photosynthesis via chlorophyll and stomata to absorb CO2 and release oxygen, while buffering torrential rainfall impact.",
+          isCorrect: true
+        },
+        {
+          text: "Absorbing pure oxygen to convert it into heavy metals in the soil.",
+          isCorrect: false
+        },
+        {
+          text: "Acting as mechanical anchors in bedrock to resist tectonic shifts.",
+          isCorrect: false
+        },
+        {
+          text: "Storing underground fire embers during extreme droughts.",
+          isCorrect: false
+        }
+      ],
+      explanation:
+        "Leaves and canopy act as photosynthetic biochemical factories (capturing CO2 and releasing O2) and interception shields dampening raindrop impact."
+    },
+    {
+      topic: "Anatomy: Branches & Limbs",
+      question:
+        "Why is the structure of Branches & Limbs on rainforest trees vital for wildlife such as orangutans and hornbills?",
+      options: [
+        {
+          text: "Forms multi-tiered crown scaffolding supporting foliage and providing arboreal corridors for wildlife transit and nesting.",
+          isCorrect: true
+        },
+        {
+          text: "Acts as an organ absorbing groundwater directly from aquifers.",
+          isCorrect: false
+        },
+        {
+          text: "Secretes natural toxic pesticides to repel all frugivorous birds.",
+          isCorrect: false
+        },
+        {
+          text: "Replaces buttress roots in binding river mud particles.",
+          isCorrect: false
+        }
+      ],
+      explanation:
+        "Sturdy branches at 40-50m form canopy architectures, anchor thousands of epiphytes, and serve as arboreal wildlife transit corridors."
+    },
+    {
+      topic: "Anatomy: Woody Trunk",
+      question:
+        "What is the dual physiological function of active xylem and phloem in the Trunk of giant rainforest trees?",
+      options: [
+        {
+          text: "Channeling hundreds of liters of water and dissolved minerals to the crown (xylem) and distributing photosynthetic sugars throughout the tree (phloem).",
+          isCorrect: true
+        },
+        {
+          text: "Producing petroleum fuel and draining soil water completely dry.",
+          isCorrect: false
+        },
+        {
+          text: "Storing volcanic ash and repelling rainfall.",
+          isCorrect: false
+        },
+        {
+          text: "Emitting methane gas to accelerate forest temperature spikes.",
+          isCorrect: false
+        }
+      ],
+      explanation:
+        "Xylem transports water and minerals upward, while phloem distributes photosynthetic nutrients downward, alongside massive biomass carbon storage."
+    },
+    {
+      topic: "Anatomy: Buttress Roots",
+      question:
+        "Why are flanged Buttress Roots (akar banir) indispensable for emergent trees rooted in thin tropical rainforest soils?",
+      options: [
+        {
+          text: "Providing lateral mechanical anchoring to prevent windthrow in shallow soil while holding riverbank soil against erosion.",
+          isCorrect: true
+        },
+        {
+          text: "Absorbing sunlight at midnight to produce food.",
+          isCorrect: false
+        },
+        {
+          text: "Digesting tree bark to convert it into toxic gas.",
+          isCorrect: false
+        },
+        {
+          text: "Piercing oil aquifers to fuel tree respiration.",
+          isCorrect: false
+        }
+      ],
+      explanation:
+        "Buttress roots spread up to 5 meters laterally to mechanically stabilize heavy trees in nutrient-thin upper soil and resist riverbank erosion."
+    },
+    {
+      topic: "Illegal Logging Threat",
+      question:
+        "What catastrophic ecological impact occurs when illegal logging tears down primary canopy trees as described in the Forest Crisis section?",
+      options: [
+        {
+          text: "Loss of canopy rainfall-buffering capacity, triggering destructive flash floods, rapid topsoil erosion, and wildlife habitat loss.",
+          isCorrect: true
+        },
+        {
+          text: "Soil immediately turns into diamond crystals.",
+          isCorrect: false
+        },
+        {
+          text: "Atmospheric oxygen spikes dangerously across the hemisphere.",
+          isCorrect: false
+        },
+        {
+          text: "Global sea levels drop by 50 meters overnight.",
+          isCorrect: false
+        }
+      ],
+      explanation:
+        "Uncontrolled logging destroys the protective canopy umbrella, triggering severe soil erosion, flash floods, and wildlife habitat fragmentation."
+    },
+    {
+      topic: "Peatland Wildfires",
+      question:
+        "Why are subterranean peat fires (karhutla) extraordinarily difficult to extinguish once ignited?",
+      options: [
+        {
+          text: "Because organic peat biomass smolders underground up to 4–8 meters deep, requiring high-pressure water injection.",
+          isCorrect: true
+        },
+        {
+          text: "Because peat fires freeze surrounding water into dry ice.",
+          isCorrect: false
+        },
+        {
+          text: "Because peat soil is made of non-flammable liquid stone.",
+          isCorrect: false
+        },
+        {
+          text: "Because peat fires only exist during torrential rainstorms.",
+          isCorrect: false
+        }
+      ],
+      explanation:
+        "Peat fires burn silently deep below the surface in dried biomass layers, requiring high-pressure lance injection of water down to 4-8 meters."
+    },
+    {
+      topic: "Law: Law No. 18/2013",
+      question:
+        "Under Indonesian Law No. 18 of 2013 on the Prevention and Eradication of Forest Destruction (UU P3H), what maximum criminal sanction threatens perpetrators of illegal logging?",
+      options: [
+        {
+          text: "Imprisonment for up to 15 years and criminal fines up to IDR 100 billion for corporations and financial backers.",
+          isCorrect: true
+        },
+        {
+          text: "A written administrative reprimand and a IDR 50,000 fine.",
+          isCorrect: false
+        },
+        {
+          text: "Community service sweeping leaves for 3 days.",
+          isCorrect: false
+        },
+        {
+          text: "No criminal sanction because trees are freely exploitable.",
+          isCorrect: false
+        }
+      ],
+      explanation:
+        "Articles 82-84 of Law No. 18/2013 impose up to 15 years imprisonment and corporate fines up to IDR 100 billion plus asset seizure."
+    },
+    {
+      topic: "Law: Strict Liability Principle",
+      question:
+        "What is the legal implication of the Strict Liability principle under Law No. 32/2009 for concession holders regarding fires on their land?",
+      options: [
+        {
+          text: "Corporations bear absolute liability for any fire within their concession without the state needing to prove intentional guilt or negligence.",
+          isCorrect: true
+        },
+        {
+          text: "Corporations are exempted from all fines if fires occur during dry seasons.",
+          isCorrect: false
+        },
+        {
+          text: "Fires are solely blamed on neighboring wildlife.",
+          isCorrect: false
+        },
+        {
+          text: "Corporations are rewarded with additional forest land concessions.",
+          isCorrect: false
+        }
+      ],
+      explanation:
+        "Strict liability mandates absolute corporate accountability for any fire within concession boundaries, bypassing the need to prove subjective fault."
+    },
+    {
+      topic: "Law: Wildlife Law No. 5/1990",
+      question:
+        "Under Law No. 5 of 1990 (KSDAE), what are the criminal penalties for capturing, killing, or trading protected species like Orangutans or Sumatran Tigers?",
+      options: [
+        {
+          text: "Imprisonment for up to 5 years and fines up to IDR 100 million, plus compulsory rehabilitation restitution.",
+          isCorrect: true
+        },
+        {
+          text: "Exemption from prosecution if captured for commercial sale.",
+          isCorrect: false
+        },
+        {
+          text: "1 month of probation without any monetary fine.",
+          isCorrect: false
+        },
+        {
+          text: "Receiving official state conservation awards.",
+          isCorrect: false
+        }
+      ],
+      explanation:
+        "Article 40 of Law No. 5/1990 penalizes hunting, harming, or trading protected wildlife with up to 5 years imprisonment and IDR 100 million fines."
+    },
+    {
+      topic: "Field Action: Manggala Agni",
+      question:
+        "As shown in the Conservation Gallery, what is the specialized mission of the Manggala Agni brigade?",
+      options: [
+        {
+          text: "Specialized forest fire suppression forces under KLHK tackling above-ground fires and underground peat embers.",
+          isCorrect: true
+        },
+        {
+          text: "Mining gold in riverbeds within conservation zones.",
+          isCorrect: false
+        },
+        {
+          text: "Operating commercial logging machinery for timber export.",
+          isCorrect: false
+        },
+        {
+          text: "Building toll roads across national parks.",
+          isCorrect: false
+        }
+      ],
+      explanation:
+        "Manggala Agni is the dedicated national forest and land firefighting brigade trained for extreme peat and canopy fire suppression."
+    },
+    {
+      topic: "Endemic Flora Restoration",
+      question:
+        "Why is replanting native endemic trees like Ironwood (Ulin) and Meranti prioritized in HutanKita's restoration efforts?",
+      options: [
+        {
+          text: "Native trees thrive in poor soils, store massive carbon reserves long-term, and restore natural ecosystem food webs.",
+          isCorrect: true
+        },
+        {
+          text: "Because these trees reach full maturity and bear fruit within 24 hours.",
+          isCorrect: false
+        },
+        {
+          text: "Because they emit synthetic air freshener fragrances into the atmosphere.",
+          isCorrect: false
+        },
+        {
+          text: "Because these trees never require any water during their lifespan.",
+          isCorrect: false
+        }
+      ],
+      explanation:
+        "High Conservation Value (HCV) native trees like Meranti and Ironwood form structural climax canopies that restore authentic, resilient rainforest ecosystems."
+    },
+    {
+      topic: "NASA FIRMS Satellite Surveillance",
+      question:
+        "How does NASA FIRMS (VIIRS S-NPP 375m) satellite technology on HutanKita's interactive map aid wildfire prevention?",
+      options: [
+        {
+          text: "Rapidly detects thermal anomalies and Fire Radiative Power (FRP) to locate hotspots before they escalate into uncontrollable conflagrations.",
+          isCorrect: true
+        },
+        {
+          text: "Sprays water automatically onto forest canopies directly from low Earth orbit.",
+          isCorrect: false
+        },
+        {
+          text: "Filters shortwave radio frequencies to listen to tree frogs in the canopy.",
+          isCorrect: false
+        },
+        {
+          text: "Redirects typhoon wind paths away from the Indonesian archipelago.",
+          isCorrect: false
+        }
+      ],
+      explanation:
+        "The VIIRS S-NPP sensor detects 375m thermal radiation anomalies from polar orbit, providing precise coordinates and confidence ratings for wildfire posts."
+    },
+    {
+      topic: "Tangible Action & Rainforest Pledge",
+      question:
+        "What is the most effective proactive action everyday citizens can take through HutanKita to protect Indonesia's rainforests?",
+      options: [
+        {
+          text: "Practicing the Rainforest Pledge, sharing conservation literacy, and utilizing the emergency directory to report fires.",
+          isCorrect: true
+        },
+        {
+          text: "Purchasing illegal unregistered timber from protected reserves.",
+          isCorrect: false
+        },
+        {
+          text: "Clearing peatland with open burning during droughts.",
+          isCorrect: false
+        },
+        {
+          text: "Ignoring early smoke plumes in conservation buffers.",
+          isCorrect: false
+        }
+      ],
+      explanation:
+        "Citizens make real impact by pledging commitment, boycotting illegal timber, spreading conservation literacy, and promptly reporting fire hotspots."
     }
-    return arr;
+  ];
+
+  function getActiveQuizBank() {
+    const isEn = typeof window.getHkLanguage === "function" && window.getHkLanguage() === "en";
+    return isEn ? QUIZ_BANK_EN : QUIZ_BANK_ID;
   }
 
   let sessionQuestions = [];
   let currentQuestionIndex = 0;
   let correctCount = 0;
   let hasAnsweredCurrent = false;
+  let participantName = "";
 
   function getQuizPredicate(score100) {
+    const isEn = typeof window.getHkLanguage === "function" && window.getHkLanguage() === "en";
     if (score100 >= 85) {
-      return "PENJAGA UTAMA RIMBA NUSANTARA";
+      return isEn ? "PRIMARY GUARDIAN OF ARCHIPELAGO RAINFOREST" : "PENJAGA UTAMA RIMBA NUSANTARA";
     }
     if (score100 >= 65) {
-      return "SAHABAT KONSERVASI HUTAN TROPIS";
+      return isEn ? "TROPICAL FOREST CONSERVATION ALLY" : "SAHABAT KONSERVASI HUTAN TROPIS";
     }
-    return "PEMBELAJAR EKOSISTEM RIMBA";
+    return isEn ? "RAINFOREST ECOSYSTEM LEARNER" : "PEMBELAJAR EKOSISTEM RIMBA";
   }
 
   /**
@@ -1354,6 +1785,7 @@ function initHkForestQuiz() {
 
     const rawName =
       (certNameInput ? certNameInput.value : "").trim() ||
+      participantName ||
       (document.getElementById("hkPledgeName")?.value || "").trim();
     const displayName = rawName || "Peserta Edukasi HutanKita";
     const dateStr = formatIndonesianDate(new Date());
@@ -1363,15 +1795,20 @@ function initHkForestQuiz() {
       hash = (hash * 29 + displayName.charCodeAt(i)) % 9000 + 1000;
     }
 
+    const isEn = typeof window.getHkLanguage === "function" && window.getHkLanguage() === "en";
     drawWhiteCertificateBase(ctx, width, height, {
-      topPillText: "HUTANKITA INDONESIA  •  PUSAT LITERASI EKOSISTEM & BOTANI",
-      mainTitle: "SERTIFIKAT KOMPETENSI & BADGE",
-      subTitle: "KELULUSAN EVALUASI EKOSISTEM HUTAN HUJAN TROPIS NUSANTARA (15 SOAL)",
+      topPillText: isEn
+        ? "HUTANKITA INDONESIA  •  CENTER FOR ECOSYSTEM & BOTANICAL LITERACY"
+        : "HUTANKITA INDONESIA  •  PUSAT LITERASI EKOSISTEM & BOTANI",
+      mainTitle: isEn ? "CERTIFICATE OF COMPETENCY & BADGE" : "SERTIFIKAT KOMPETENSI & BADGE",
+      subTitle: isEn
+        ? "GRADUATION EVALUATION OF ARCHIPELAGO TROPICAL RAINFOREST ECOSYSTEMS (15 QUESTIONS)"
+        : "KELULUSAN EVALUASI EKOSISTEM HUTAN HUJAN TROPIS NUSANTARA (15 SOAL)",
       dateStr,
-      serialId: `No. Sertifikat: HK-QUIZ-2026-${hash}`,
-      badgeTopText: "NILAI AKHIR",
+      serialId: isEn ? `Certificate No.: HK-QUIZ-2026-${hash}` : `No. Sertifikat: HK-QUIZ-2026-${hash}`,
+      badgeTopText: isEn ? "FINAL SCORE" : "NILAI AKHIR",
       badgeCenterMain: `${score100} / 100`,
-      badgeCenterSub: `${correctCount}/${total} BENAR`
+      badgeCenterSub: isEn ? `${correctCount}/${total} CORRECT` : `${correctCount}/${total} BENAR`
     });
 
     const centerX = width / 2;
@@ -1382,7 +1819,7 @@ function initHkForestQuiz() {
     // Pengantar nama peserta
     ctx.font = "400 20px 'Outfit', sans-serif";
     ctx.fillStyle = "#334155";
-    ctx.fillText("Sertifikat kelulusan evaluasi literasi kehutanan ini diberikan kepada:", centerX, 286);
+    ctx.fillText(isEn ? "This forestry literacy competency certificate is officially presented to:" : "Sertifikat kelulusan evaluasi literasi kehutanan ini diberikan kepada:", centerX, 286);
 
     // Nama peserta
     ctx.font = "800 46px 'Outfit', sans-serif";
@@ -1433,7 +1870,7 @@ function initHkForestQuiz() {
     // Kolom 1: Nilai Angka
     ctx.font = "600 15px 'Outfit', sans-serif";
     ctx.fillStyle = "#047857";
-    ctx.fillText("NILAI EVALUASI", col1X, scoreBoxY + 42);
+    ctx.fillText(isEn ? "EVALUATION SCORE" : "NILAI EVALUASI", col1X, scoreBoxY + 42);
     ctx.font = "800 44px 'Outfit', sans-serif";
     ctx.fillStyle = "#052e16";
     ctx.fillText(`${score100} / 100`, col1X, scoreBoxY + 94);
@@ -1441,7 +1878,7 @@ function initHkForestQuiz() {
     // Kolom 2: Predikat Badge
     ctx.font = "600 15px 'Outfit', sans-serif";
     ctx.fillStyle = "#b48a3e";
-    ctx.fillText("PREDIKAT BADGE KOMPETENSI", col2X, scoreBoxY + 42);
+    ctx.fillText(isEn ? "COMPETENCY BADGE" : "PREDIKAT BADGE KOMPETENSI", col2X, scoreBoxY + 42);
     ctx.font = "800 20px 'Outfit', sans-serif";
     ctx.fillStyle = "#064e3b";
     ctx.fillText(predicate, col2X, scoreBoxY + 92);
@@ -1449,16 +1886,17 @@ function initHkForestQuiz() {
     // Kolom 3: Ketepatan Jawaban
     ctx.font = "600 15px 'Outfit', sans-serif";
     ctx.fillStyle = "#047857";
-    ctx.fillText("KETEPATAN SOAL", col3X, scoreBoxY + 42);
+    ctx.fillText(isEn ? "ACCURACY RATE" : "KETEPATAN SOAL", col3X, scoreBoxY + 42);
     ctx.font = "800 36px 'Outfit', sans-serif";
     ctx.fillStyle = "#052e16";
-    ctx.fillText(`${correctCount} / ${total} Soal`, col3X, scoreBoxY + 94);
+    ctx.fillText(isEn ? `${correctCount} / ${total} Correct` : `${correctCount} / ${total} Soal`, col3X, scoreBoxY + 94);
 
     // Deskripsi materi yang telah dikuasai
     ctx.font = "400 18px 'Outfit', sans-serif";
     ctx.fillStyle = "#334155";
-    const descText =
-      "Telah menyelesaikan uji pemahaman 15 soal mencakup Anatomi Pohon 3D (Akar Banir, Batang, Dahan, Kanopi), Ekologi Kubah Gambut, Sanksi Pidana UU Kehutanan (UU P3H, UU PPLH, UU KSDAE), serta Pemantauan Satelit Titik Panas.";
+    const descText = isEn
+      ? "Has successfully completed the 15-question evaluation covering 3D Tree Anatomy (Buttress Roots, Trunk, Branches, Canopy), Peat Dome Ecology, Forestry Criminal Sanctions (Laws No. 18/2013, 32/2009, 5/1990), and Satellite Fire Monitoring."
+      : "Telah menyelesaikan uji pemahaman 15 soal mencakup Anatomi Pohon 3D (Akar Banir, Batang, Dahan, Kanopi), Ekologi Kubah Gambut, Sanksi Pidana UU Kehutanan (UU P3H, UU PPLH, UU KSDAE), serta Pemantauan Satelit Titik Panas.";
     const descLines = wrapCanvasLines(ctx, descText, 1020).slice(0, 2);
     descLines.forEach((line, idx) => {
       ctx.fillText(line, centerX, 594 + idx * 30);
@@ -1467,8 +1905,93 @@ function initHkForestQuiz() {
     ctx.restore();
   }
 
+  /**
+   * Mengatur tampilan kuis agar benar-benar bertahap sesuai alur aksi pengguna:
+   * - "intro"   : Hanya menampilkan Formulir Nama & Petunjuk Materi (Tahap 1).
+   * - "quiz"    : Hanya menampilkan Pengerjaan 15 Soal Kuis (Tahap 2).
+   * - "summary" : Hanya menampilkan Nilai Akhir & Pratinjau Sertifikat Resmi (Tahap 3).
+   */
+  function setQuizStage(stage) {
+    if (quizDialog) quizDialog.scrollTop = 0;
+    const container = document.getElementById("hkQuizContainer");
+    if (container) container.scrollTop = 0;
+
+    const dialogIntroDesc = document.getElementById("hkQuizDialogIntroDesc");
+    const dialogTitle = document.getElementById("hkQuizDialogTitle");
+
+    const isEn = isHkEnglish();
+
+    if (stage === "intro") {
+      if (introAreaEl) {
+        introAreaEl.hidden = false;
+        introAreaEl.style.display = "flex";
+      }
+      if (activeAreaEl) {
+        activeAreaEl.hidden = true;
+        activeAreaEl.style.display = "none";
+      }
+      if (summaryEl) {
+        summaryEl.hidden = true;
+        summaryEl.style.display = "none";
+      }
+      if (dialogIntroDesc) {
+        dialogIntroDesc.hidden = false;
+        dialogIntroDesc.style.display = "block";
+      }
+      if (dialogTitle) {
+        dialogTitle.textContent = isEn
+          ? "Rainforest Ecosystem Quiz (15 Questions)"
+          : "Kuis Edukasi Rimba Nusantara (15 Soal)";
+      }
+    } else if (stage === "quiz") {
+      if (introAreaEl) {
+        introAreaEl.hidden = true;
+        introAreaEl.style.display = "none";
+      }
+      if (activeAreaEl) {
+        activeAreaEl.hidden = false;
+        activeAreaEl.style.display = "flex";
+      }
+      if (summaryEl) {
+        summaryEl.hidden = true;
+        summaryEl.style.display = "none";
+      }
+      if (dialogIntroDesc) {
+        dialogIntroDesc.hidden = true;
+        dialogIntroDesc.style.display = "none";
+      }
+      if (dialogTitle) {
+        dialogTitle.textContent = isEn
+          ? "Rainforest Knowledge Evaluation"
+          : "Evaluasi Pemahaman Rimba Nusantara";
+      }
+    } else if (stage === "summary") {
+      if (introAreaEl) {
+        introAreaEl.hidden = true;
+        introAreaEl.style.display = "none";
+      }
+      if (activeAreaEl) {
+        activeAreaEl.hidden = true;
+        activeAreaEl.style.display = "none";
+      }
+      if (summaryEl) {
+        summaryEl.hidden = false;
+        summaryEl.style.display = "flex";
+      }
+      if (dialogIntroDesc) {
+        dialogIntroDesc.hidden = true;
+        dialogIntroDesc.style.display = "none";
+      }
+      if (dialogTitle) {
+        dialogTitle.textContent = isEn
+          ? "Evaluation Results & Official Certificate"
+          : "Hasil Evaluasi & Sertifikat Resmi";
+      }
+    }
+  }
+
   function startNewSession() {
-    sessionQuestions = shuffleArray(QUIZ_BANK).map((item) => ({
+    sessionQuestions = shuffleArray(getActiveQuizBank()).map((item) => ({
       topic: item.topic,
       question: item.question,
       explanation: item.explanation,
@@ -1478,8 +2001,7 @@ function initHkForestQuiz() {
     correctCount = 0;
     hasAnsweredCurrent = false;
 
-    if (summaryEl) summaryEl.hidden = true;
-    if (activeAreaEl) activeAreaEl.hidden = false;
+    setQuizStage("quiz");
     renderCurrentQuestion();
   }
 
@@ -1487,14 +2009,26 @@ function initHkForestQuiz() {
     const current = sessionQuestions[currentQuestionIndex];
     if (!current) return;
 
+    const isEn = isHkEnglish();
     hasAnsweredCurrent = false;
     const total = sessionQuestions.length;
 
     if (progressEl) {
-      progressEl.textContent = `Soal ${currentQuestionIndex + 1} dari ${total}  •  Benar: ${correctCount}`;
+      progressEl.textContent = isEn
+        ? `Question ${currentQuestionIndex + 1} of ${total}  •  Correct: ${correctCount}`
+        : `Soal ${currentQuestionIndex + 1} dari ${total}  •  Benar: ${correctCount}`;
+    }
+    if (userBadgeEl) {
+      const shortName = participantName && participantName.length > 20
+        ? participantName.slice(0, 18) + "…"
+        : participantName;
+      userBadgeEl.textContent = participantName
+        ? `${isEn ? "Participant:" : "Peserta:"} ${shortName}`
+        : (isEn ? "Quiz Participant" : "Peserta Edukasi");
+      userBadgeEl.title = participantName ? `${isEn ? "Participant:" : "Peserta:"} ${participantName}` : "";
     }
     if (topicEl) {
-      topicEl.textContent = `Topik: ${current.topic}`;
+      topicEl.textContent = `${isEn ? "Topic:" : "Topik:"} ${current.topic}`;
     }
     questionEl.textContent = current.question;
 
@@ -1517,7 +2051,13 @@ function initHkForestQuiz() {
       btn.appendChild(keySpan);
       btn.appendChild(textSpan);
 
-      btn.addEventListener("click", () => handleSelectOption(idx));
+      btn.addEventListener("click", (event) => {
+        if (event) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        handleSelectOption(idx);
+      });
       optionsEl.appendChild(btn);
     });
 
@@ -1533,8 +2073,8 @@ function initHkForestQuiz() {
       if (nextLabel) {
         nextLabel.textContent =
           currentQuestionIndex === total - 1
-            ? "Lihat Nilai & Sertifikat Kelulusan"
-            : "Soal berikutnya";
+            ? (isEn ? "Finish & Submit Quiz" : "Selesaikan & Submit Kuis")
+            : (isEn ? "Next Question" : "Soal berikutnya");
       }
     }
   }
@@ -1543,6 +2083,7 @@ function initHkForestQuiz() {
     if (hasAnsweredCurrent) return;
     hasAnsweredCurrent = true;
 
+    const isEn = isHkEnglish();
     const current = sessionQuestions[currentQuestionIndex];
     if (!current) return;
 
@@ -1554,7 +2095,9 @@ function initHkForestQuiz() {
 
     const total = sessionQuestions.length;
     if (progressEl) {
-      progressEl.textContent = `Soal ${currentQuestionIndex + 1} dari ${total}  •  Benar: ${correctCount}`;
+      progressEl.textContent = isEn
+        ? `Question ${currentQuestionIndex + 1} of ${total}  •  Correct: ${correctCount}`
+        : `Soal ${currentQuestionIndex + 1} dari ${total}  •  Benar: ${correctCount}`;
     }
 
     const buttons = optionsEl.querySelectorAll(".hk-quiz-option-btn");
@@ -1573,8 +2116,8 @@ function initHkForestQuiz() {
     if (feedbackEl && feedbackStatusEl && feedbackTextEl) {
       feedbackEl.classList.toggle("is-correct", isCorrect);
       feedbackStatusEl.textContent = isCorrect
-        ? "Jawaban tepat"
-        : "Jawaban belum tepat";
+        ? (isEn ? "Correct Answer" : "Jawaban tepat")
+        : (isEn ? "Incorrect Answer" : "Jawaban belum tepat");
       feedbackTextEl.textContent = current.explanation;
       feedbackEl.hidden = false;
     }
@@ -1586,30 +2129,36 @@ function initHkForestQuiz() {
   }
 
   function showQuizSummary() {
+    const isEn = isHkEnglish();
     const total = sessionQuestions.length || 15;
     const score100 = Math.round((correctCount / total) * 100);
     const predicate = getQuizPredicate(score100);
 
-    if (activeAreaEl) activeAreaEl.hidden = true;
+    setQuizStage("summary");
 
     if (scoreTitleEl) {
-      scoreTitleEl.textContent = `Nilai Akhir Anda: ${score100} / 100 (${correctCount} dari ${total} Soal Tepat)`;
+      scoreTitleEl.textContent = isEn
+        ? `Your Final Score: ${score100} / 100 (${correctCount} of ${total} Questions Correct)`
+        : `Nilai Akhir Anda: ${score100} / 100 (${correctCount} dari ${total} Soal Tepat)`;
     }
 
+    const greetingName = participantName ? ` ${participantName}` : "";
     if (scoreDescEl) {
-      scoreDescEl.textContent = `Selamat! Anda meraih predikat "${predicate}". Ketik nama lengkap Anda di bawah ini untuk mencetak dan mengunduh Sertifikat & Badge Kelulusan Resmi bertanda tangan Founder HutanKita.`;
+      scoreDescEl.textContent = isEn
+        ? `Congratulations${greetingName}! You have successfully completed all 15 questions and earned the "${predicate}" badge. Your name is officially printed on the Certificate below. You can download it directly in PNG format.`
+        : `Selamat${greetingName}! Anda berhasil menyelesaikan seluruh evaluasi 15 soal dan meraih predikat "${predicate}". Nama Anda otomatis tercantum pada Sertifikat Resmi di bawah ini. Anda dapat mengunduhnya langsung dalam format PNG.`;
     }
 
-    // Isi otomatis nama dari localStorage bila sudah pernah mengisi di ikrar
-    if (certNameInput && !certNameInput.value.trim()) {
-      const pledgeName = document.getElementById("hkPledgeName")?.value || "";
-      if (pledgeName.trim()) {
-        certNameInput.value = pledgeName.trim();
+    // Pastikan input nama di sertifikat terisi dengan nama peserta yang dimasukkan di awal
+    if (certNameInput) {
+      if (participantName) {
+        certNameInput.value = participantName;
+      } else if (!certNameInput.value.trim()) {
+        const pledgeName = document.getElementById("hkPledgeName")?.value || "";
+        if (pledgeName.trim()) {
+          certNameInput.value = pledgeName.trim();
+        }
       }
-    }
-
-    if (summaryEl) {
-      summaryEl.hidden = false;
     }
 
     drawQuizScoreCertificate();
@@ -1617,13 +2166,72 @@ function initHkForestQuiz() {
       document.fonts.ready.then(drawQuizScoreCertificate);
     }
 
-    if (certNameInput) {
-      setTimeout(() => certNameInput.focus(), 60);
+    if (downloadCertBtn) {
+      setTimeout(() => downloadCertBtn.focus(), 60);
     }
   }
 
+  // Event handler formulir pendaftaran nama kuis (Tahap 1)
+  if (startNameInput) {
+    startNameInput.addEventListener("input", () => {
+      if (nameErrorEl) {
+        nameErrorEl.hidden = true;
+        nameErrorEl.style.display = "none";
+      }
+      if (startNameInput.value.trim()) {
+        participantName = startNameInput.value.trim();
+      }
+    });
+
+    startNameInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        if (startBtn) startBtn.click();
+      }
+    });
+  }
+
+  if (startBtn) {
+    startBtn.addEventListener("click", (event) => {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      const rawName = (startNameInput ? startNameInput.value : "").trim();
+      if (!rawName || rawName.length < 2) {
+        if (nameErrorEl) {
+          nameErrorEl.textContent = isHkEnglish()
+            ? "Please enter your full name (at least 2 letters) before starting."
+            : "Silakan masukkan nama lengkap Anda (minimal 2 huruf) terlebih dahulu.";
+          nameErrorEl.hidden = false;
+          nameErrorEl.style.display = "block";
+        }
+        if (startNameInput) startNameInput.focus();
+        return;
+      }
+
+      if (nameErrorEl) {
+        nameErrorEl.hidden = true;
+        nameErrorEl.style.display = "none";
+      }
+
+      participantName = rawName;
+      if (certNameInput) {
+        certNameInput.value = participantName;
+      }
+
+      startNewSession();
+      const firstBtn = optionsEl.querySelector(".hk-quiz-option-btn");
+      if (firstBtn) firstBtn.focus();
+    });
+  }
+
   if (nextBtn) {
-    nextBtn.addEventListener("click", () => {
+    nextBtn.addEventListener("click", (event) => {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
       if (currentQuestionIndex < sessionQuestions.length - 1) {
         currentQuestionIndex += 1;
         renderCurrentQuestion();
@@ -1636,26 +2244,37 @@ function initHkForestQuiz() {
   }
 
   if (restartBtn) {
-    restartBtn.addEventListener("click", () => {
-      startNewSession();
-      const firstBtn = optionsEl.querySelector(".hk-quiz-option-btn");
-      if (firstBtn) firstBtn.focus();
+    restartBtn.addEventListener("click", (event) => {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      setQuizStage("intro");
+      if (startNameInput) {
+        startNameInput.value = participantName;
+        setTimeout(() => startNameInput.focus(), 60);
+      }
     });
   }
 
   if (certNameInput) {
     certNameInput.addEventListener("input", () => {
+      participantName = certNameInput.value.trim() || participantName;
       drawQuizScoreCertificate();
     });
   }
 
   if (downloadCertBtn && certCanvas) {
-    downloadCertBtn.addEventListener("click", () => {
+    downloadCertBtn.addEventListener("click", (event) => {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
       drawQuizScoreCertificate();
       try {
         const dataUrl = certCanvas.toDataURL("image/png");
         const link = document.createElement("a");
-        const cleanName = ((certNameInput ? certNameInput.value : "").trim() || "peserta-hutankita")
+        const cleanName = ((certNameInput ? certNameInput.value : "").trim() || participantName || "peserta-hutankita")
           .toLowerCase()
           .replace(/[^a-z0-9]+/g, "-")
           .replace(/^-|-$/g, "");
@@ -1665,11 +2284,19 @@ function initHkForestQuiz() {
         link.click();
         document.body.removeChild(link);
         if (typeof window.showToast === "function") {
-          window.showToast("Sertifikat & Badge Nilai Kuis (PNG) berhasil diunduh.");
+          window.showToast(
+            isHkEnglish()
+              ? "Quiz Certificate & Badge (PNG) downloaded successfully."
+              : "Sertifikat & Badge Nilai Kuis (PNG) berhasil diunduh."
+          );
         }
       } catch (_err) {
         if (typeof window.showToast === "function") {
-          window.showToast("Gagal mengunduh sertifikat kuis pada peramban ini.");
+          window.showToast(
+            isHkEnglish()
+              ? "Failed to download quiz certificate in this browser."
+              : "Gagal mengunduh sertifikat kuis pada peramban ini."
+          );
         }
       }
     });
@@ -1677,15 +2304,31 @@ function initHkForestQuiz() {
 
   function openQuizDialog() {
     if (!quizDialog) return;
-    if (!sessionQuestions.length) {
-      startNewSession();
+
+    // Bila belum ada sesi aktif atau sedang di tahap intro, pastikan masuk ke Tahap 1
+    if ((!activeAreaEl || activeAreaEl.hidden || activeAreaEl.style.display === "none") &&
+        (!summaryEl || summaryEl.hidden || summaryEl.style.display === "none")) {
+      setQuizStage("intro");
+
+      if (startNameInput && !startNameInput.value.trim()) {
+        const pledgeName = (document.getElementById("hkPledgeName")?.value || "").trim();
+        if (pledgeName) {
+          startNameInput.value = pledgeName;
+          participantName = pledgeName;
+        }
+      }
+      if (startNameInput) {
+        setTimeout(() => startNameInput.focus(), 120);
+      }
     }
+
     if (typeof quizDialog.showModal === "function") {
       if (!quizDialog.open) quizDialog.showModal();
     } else {
       quizDialog.setAttribute("open", "");
     }
-    if (!summaryEl?.hidden) {
+
+    if (summaryEl && !summaryEl.hidden && summaryEl.style.display !== "none") {
       drawQuizScoreCertificate();
     }
   }
@@ -1706,14 +2349,38 @@ function initHkForestQuiz() {
     btnOpenQuizFromDetail.addEventListener("click", openQuizDialog);
   }
   if (closeTopBtn) {
-    closeTopBtn.addEventListener("click", closeQuizDialog);
+    closeTopBtn.addEventListener("click", (event) => {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      closeQuizDialog();
+    });
   }
   if (closeBottomBtn) {
-    closeBottomBtn.addEventListener("click", closeQuizDialog);
+    closeBottomBtn.addEventListener("click", (event) => {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      closeQuizDialog();
+    });
   }
 
   if (quizDialog) {
+    // Cegah seluruh klik di dalam konten dialog keluar/menutup dialog
+    const dialogInner = quizDialog.querySelector(".hk-pledge-dialog-inner");
+    if (dialogInner) {
+      dialogInner.addEventListener("click", (event) => {
+        event.stopPropagation();
+      });
+    }
+
+    // Hanya tutup bila klik benar-benar terjadi di luar/backdrop elemen <dialog>
     quizDialog.addEventListener("click", (event) => {
+      if (event.target !== quizDialog) {
+        return;
+      }
       const rect = quizDialog.getBoundingClientRect();
       const clickedInDialog =
         rect.top <= event.clientY &&
@@ -1727,10 +2394,30 @@ function initHkForestQuiz() {
   }
 
   ensureFounderSignatureLoaded(() => {
-    if (summaryEl && !summaryEl.hidden) {
+    if (summaryEl && !summaryEl.hidden && summaryEl.style.display !== "none") {
       drawQuizScoreCertificate();
     }
   });
 
-  startNewSession();
+  // Sinkronisasi otomatis bahasa jika pengguna mengganti ID/ENG saat kuis dibuka
+  window.addEventListener("hk:languagechange", () => {
+    if (activeAreaEl && !activeAreaEl.hidden && activeAreaEl.style.display !== "none") {
+      const activeBank = getActiveQuizBank();
+      if (sessionQuestions[currentQuestionIndex]) {
+        // Cocokkan soal ke bahasa baru berdasarkan indeks atau topik
+        const newQ = activeBank.find((item) => item.topic === sessionQuestions[currentQuestionIndex].topic) || activeBank[currentQuestionIndex];
+        if (newQ) {
+          sessionQuestions[currentQuestionIndex].topic = newQ.topic;
+          sessionQuestions[currentQuestionIndex].question = newQ.question;
+          sessionQuestions[currentQuestionIndex].explanation = newQ.explanation;
+          renderCurrentQuestion();
+        }
+      }
+    } else if (summaryEl && !summaryEl.hidden && summaryEl.style.display !== "none") {
+      showQuizSummary();
+    }
+  });
+
+  // Tampilkan tahap intro/pendaftaran secara default saat pertama kali dialog dimuat
+  setQuizStage("intro");
 }

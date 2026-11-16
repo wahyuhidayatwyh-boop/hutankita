@@ -35,173 +35,274 @@ document.addEventListener("DOMContentLoaded", () => {
   // ========================================================================
   // EXPANDABLE & INTERACTIVE FULL-TEXT LIVE SEARCH
   // ========================================================================
+  const searchBox = document.getElementById("navSearchBox");
+  const heroNav = document.querySelector(".hero-nav");
   const searchClearBtn = document.getElementById("searchClearBtn");
   const searchResultsDropdown = document.getElementById("searchResultsDropdown");
+
+  function setSearchBarOpenState(isOpen) {
+    if (searchInput) searchInput.classList.toggle("open", isOpen);
+    if (searchBox) searchBox.classList.toggle("is-search-open", isOpen);
+    if (heroNav) heroNav.classList.toggle("is-search-active", isOpen);
+  }
+
+  // Helper Bahasa Aktif
+  function isEnglishLang() {
+    return typeof window.getHkLanguage === "function" && window.getHkLanguage() === "en";
+  }
 
   // Database Konten Edukasi HutanKita
   const SEARCH_DATABASE = [
     {
       title: "Anatomi Pohon & Botani 3D",
+      title_en: "3D Tree Anatomy & Botany",
       category: "Anatomi 3D",
+      category_en: "3D Anatomy",
       snippet: "Visualisasi interaktif 3D struktur pohon, jaringan botani, xilem floem, dan fisiologi.",
+      snippet_en: "Interactive 3D visualization of tree structure, botanical tissues, xylem, phloem, and physiology.",
       target: "#edukasi",
-      keywords: ["anatomi", "botani", "pohon", "3d", "struktur", "sel", "jaringan", "fisiologi", "edukasi"]
+      keywords: ["anatomi", "botani", "pohon", "3d", "struktur", "sel", "jaringan", "fisiologi", "edukasi"],
+      keywords_en: ["anatomy", "botany", "tree", "3d", "structure", "cell", "tissue", "physiology", "education"]
     },
     {
       title: "Daun & Klorofil (Fotosintesis)",
+      title_en: "Leaves & Chlorophyll (Photosynthesis)",
       category: "Anatomi 3D",
+      category_en: "3D Anatomy",
       snippet: "Pabrik biokimia penghasil oksigen dunia, penyerapan CO2, dan respirasi stomata.",
+      snippet_en: "Biochemical powerhouse generating Earth's oxygen, absorbing CO2, and regulating stomatal transpiration.",
       target: "#edukasi",
       action: () => triggerAnatomyPart("daun"),
-      keywords: ["daun", "klorofil", "fotosintesis", "oksigen", "stomata", "karbon", "co2", "hijau", "pabrik oksigen"]
+      keywords: ["daun", "klorofil", "fotosintesis", "oksigen", "stomata", "karbon", "co2", "hijau", "pabrik oksigen"],
+      keywords_en: ["leaves", "leaf", "canopy", "chlorophyll", "photosynthesis", "oxygen", "stomata", "carbon", "co2"]
     },
     {
       title: "Batang & Kambium (Xilem - Floem)",
+      title_en: "Trunk & Cambium (Xylem - Phloem)",
       category: "Anatomi 3D",
+      category_en: "3D Anatomy",
       snippet: "Pilar kokoh rimba, cincin pertumbuhan tahunan, serta pembuluh transportasi hara.",
+      snippet_en: "Sturdy rainforest pillar, annual growth rings, and nutrient-transporting vascular conduits.",
       target: "#edukasi",
       action: () => triggerAnatomyPart("batang"),
-      keywords: ["batang", "kambium", "xilem", "floem", "cincin", "kayu", "nutrisi", "transportasi", "pembuluh"]
+      keywords: ["batang", "kambium", "xilem", "floem", "cincin", "kayu", "nutrisi", "transportasi", "pembuluh"],
+      keywords_en: ["trunk", "cambium", "xylem", "phloem", "rings", "wood", "nutrients", "transport", "bark"]
     },
     {
       title: "Akar & Jaringan Mikoriza",
+      title_en: "Buttress Roots & Mycorrhizal Network",
       category: "Anatomi 3D",
+      category_en: "3D Anatomy",
       snippet: "Jangkar penopang bumi, pencegah longsor & erosi, serta simbiotik mikoriza.",
+      snippet_en: "Geological anchors stabilizing slopes, preventing landslides & erosion, and supporting symbiotic mycorrhizae.",
       target: "#edukasi",
       action: () => triggerAnatomyPart("akar"),
-      keywords: ["akar", "mikoriza", "jamur", "tanah", "longsor", "jangkar", "erosi", "hara", "serapan"]
+      keywords: ["akar", "mikoriza", "jamur", "tanah", "longsor", "jangkar", "erosi", "hara", "serapan"],
+      keywords_en: ["roots", "root", "buttress", "mycorrhiza", "fungi", "soil", "landslide", "anchor", "erosion"]
     },
     {
       title: "Bunga Rimba & Penyerbukan",
+      title_en: "Rainforest Blossoms & Pollination",
       category: "Anatomi 3D",
+      category_en: "3D Anatomy",
       snippet: "Siklus reproduksi botani kanopi rimba, nektar bunga, dan polinator lebah hutan.",
+      snippet_en: "Botanical canopy reproduction cycle, floral nectar, and wild forest bee pollinators.",
       target: "#edukasi",
       action: () => triggerAnatomyPart("bunga"),
-      keywords: ["bunga", "penyerbukan", "polinasi", "lebah", "nektar", "reproduksi", "benang sari"]
+      keywords: ["bunga", "penyerbukan", "polinasi", "lebah", "nektar", "reproduksi", "benang sari"],
+      keywords_en: ["flower", "blossom", "pollination", "bee", "nectar", "reproduction"]
     },
     {
       title: "Buah & Biji Kanopi",
+      title_en: "Canopy Fruits & Seeds",
       category: "Anatomi 3D",
+      category_en: "3D Anatomy",
       snippet: "Generasi penerus rimba, regenerasi kanopi lewat angin dan satwa endemik nusantara.",
+      snippet_en: "Next-generation rainforest regeneration dispersed by wind and endemic archipelago wildlife.",
       target: "#edukasi",
       action: () => triggerAnatomyPart("buah"),
-      keywords: ["buah", "biji", "kanopi", "regenerasi", "persebaran", "satwa", "generasi"]
+      keywords: ["buah", "biji", "kanopi", "regenerasi", "persebaran", "satwa", "generasi"],
+      keywords_en: ["fruit", "seed", "canopy", "regeneration", "dispersal", "wildlife"]
     },
     {
       title: "Pohon Ulin Kalimantan (Kayu Besi)",
+      title_en: "Bornean Ironwood Tree (Ulin)",
       category: "Spesies Langka",
+      category_en: "Rare Species",
       snippet: "Kayu besi Kalimantan legendaris (Eusideroxylon zwageri) yang tahan ratusan tahun.",
+      snippet_en: "Legendary Bornean ironwood (Eusideroxylon zwageri) enduring for centuries.",
       target: "#edukasi",
-      keywords: ["ulin", "kayu besi", "kalimantan", "zwageri", "eusideroxylon", "endemik", "purba", "tenggarong"]
+      keywords: ["ulin", "kayu besi", "kalimantan", "zwageri", "eusideroxylon", "endemik", "purba", "tenggarong"],
+      keywords_en: ["ironwood", "ulin", "borneo", "kalimantan", "endemic", "ancient"]
     },
     {
       title: "Meranti Merah & Dipterokarpa",
+      title_en: "Red Meranti & Dipterocarps",
       category: "Spesies Langka",
+      category_en: "Rare Species",
       snippet: "Raksasa kanopi rimba Dipterokarpa nusantara yang menjulang hingga 70 meter.",
+      snippet_en: "Emergent Dipterocarp rainforest giants soaring up to 70 meters across the archipelago.",
       target: "#edukasi",
-      keywords: ["meranti", "meranti merah", "shorea", "dipterokarpa", "kanopi", "pohon raksasa"]
+      keywords: ["meranti", "meranti merah", "shorea", "dipterokarpa", "kanopi", "pohon raksasa"],
+      keywords_en: ["meranti", "red meranti", "shorea", "dipterocarp", "canopy", "giant tree"]
     },
     {
       title: "Cendana Wangi & Gaharu Super",
+      title_en: "Fragrant Sandalwood & Agarwood",
       category: "Spesies Langka",
+      category_en: "Rare Species",
       snippet: "Spesies resin aromatik bernilai tinggi asli NTT dan kepulauan nusantara.",
+      snippet_en: "High-value aromatic resinous species native to East Nusa Tenggara and the Indonesian archipelago.",
       target: "#edukasi",
-      keywords: ["cendana", "gaharu", "cendana wangi", "atsiri", "ntt", "aquilaria", "resin"]
+      keywords: ["cendana", "gaharu", "cendana wangi", "atsiri", "ntt", "aquilaria", "resin"],
+      keywords_en: ["sandalwood", "agarwood", "oud", "resin", "aromatic", "endemic"]
     },
     {
       title: "Krisis & Ancaman Perusakan Hutan",
+      title_en: "Forest Crisis & Deforestation Threats",
       category: "Krisis Hutan",
+      category_en: "Forest Crisis",
       snippet: "Investigasi laju deforestasi liar, pembukaan lahan sawit, dan emisi karbon karhutla.",
+      snippet_en: "Investigation into illegal deforestation rates, land clearing, and wildfire carbon emissions.",
       target: "#perusakan-hutan",
-      keywords: ["krisis", "perusakan", "deforestasi", "ancaman", "pembalakan", "gambut", "rusak", "karbon"]
+      keywords: ["krisis", "perusakan", "deforestasi", "ancaman", "pembalakan", "gambut", "rusak", "karbon"],
+      keywords_en: ["crisis", "destruction", "deforestation", "threat", "logging", "peat", "carbon"]
     },
     {
       title: "Penebangan Liar (Illegal Logging)",
+      title_en: "Illegal Logging & Timber Felling",
       category: "Krisis Hutan",
+      category_en: "Forest Crisis",
       snippet: "Penyitaan truk logging, perambahan suaka alam, dan penindakan mafia perusak rimba.",
+      snippet_en: "Seizure of logging trucks, sanctuary encroachment, and crackdowns on illegal timber syndicates.",
       target: "#perusakan-hutan",
-      keywords: ["penebangan liar", "illegal logging", "logging", "pembalakan", "penebangan", "mafia kayu", "kayu bulat"]
+      keywords: ["penebangan liar", "illegal logging", "logging", "pembalakan", "penebangan", "mafia kayu", "kayu bulat"],
+      keywords_en: ["illegal logging", "logging", "timber", "felling", "deforestation", "encroachment"]
     },
     {
       title: "Karhutla & Kebakaran Lahan Gambut",
+      title_en: "Wildfires & Peatland Burning",
       category: "Krisis Hutan",
+      category_en: "Forest Crisis",
       snippet: "Bara gambut kedalaman 4 meter penyumbang kabut asap beracun dan krisis iklim.",
+      snippet_en: "Subterranean peat embers burning 4–8 meters deep, driving toxic haze and climate crisis.",
       target: "#perusakan-hutan",
-      keywords: ["karhutla", "kebakaran", "api", "gambut", "kabut asap", "asap", "bara", "emisi", "lahan gambut"]
+      keywords: ["karhutla", "kebakaran", "api", "gambut", "kabut asap", "asap", "bara", "emisi", "lahan gambut"],
+      keywords_en: ["wildfire", "wildfires", "fire", "peat", "peatland", "haze", "smoke", "embers", "emissions"]
     },
     {
       title: "Jerat Hukum & Sanksi Pidana Kehutanan",
+      title_en: "Forestry Laws & Criminal Sanctions",
       category: "Hukum Kehutanan",
-      snippet: "Ancaman 15 tahun penjara dan denda Rp 10 Miliar berdasarkan UU No. 18 Tahun 2013.",
+      category_en: "Forestry Law",
+      snippet: "Ancaman 15 tahun penjara dan denda Rp 100 Miliar berdasarkan UU No. 18 Tahun 2013.",
+      snippet_en: "Penalties of up to 15 years imprisonment and IDR 100 Billion fines under Law No. 18/2013.",
       target: "#perusakan-hutan",
       action: () => openPenaltyAccordion(),
-      keywords: ["sanksi", "pidana", "hukum", "uu kehutanan", "penjara", "denda", "15 tahun", "10 miliar", "gakkum", "undang-undang"]
+      keywords: ["sanksi", "pidana", "hukum", "uu kehutanan", "penjara", "denda", "15 tahun", "10 miliar", "gakkum", "undang-undang"],
+      keywords_en: ["law", "laws", "penalty", "penalties", "sanctions", "criminal", "prison", "fine", "article", "statute"]
     },
     {
       title: "Galeri Rekaman: Aksi Nyata Rimba",
+      title_en: "Action Gallery: Rainforest Guardians",
       category: "Galeri Rimba",
+      category_en: "Action Gallery",
       snippet: "Dokumentasi visual patroli rimba nusantara, evakuasi satwa, dan pemadaman garis depan.",
+      snippet_en: "Visual documentation of ranger patrols, wildlife rescues, and frontline wildfire suppression.",
       target: "#galeri-hutan",
-      keywords: ["galeri", "dokumentasi", "foto", "rekaman", "aksi", "patroli", "koleksi"]
+      keywords: ["galeri", "dokumentasi", "foto", "rekaman", "aksi", "patroli", "koleksi"],
+      keywords_en: ["gallery", "documentation", "photos", "action", "patrol", "conservation"]
     },
     {
       title: "Evakuasi & Pelepasan Orangutan",
+      title_en: "Orangutan Rescue & Release",
       category: "Galeri Rimba",
+      category_en: "Action Gallery",
       snippet: "Penyelamatan induk dan anak orangutan dari kepungan karhutla menuju suaka rehabilitasi.",
+      snippet_en: "Rescuing mother and infant orangutans from wildfire zones to rehabilitation sanctuaries.",
       target: "#galeri-hutan",
       action: () => slideGalleryTo(0),
-      keywords: ["orangutan", "evakuasi", "satwa", "pelepasliaran", "konservasi", "primata", "hewan"]
+      keywords: ["orangutan", "evakuasi", "satwa", "pelepasliaran", "konservasi", "primata", "hewan"],
+      keywords_en: ["orangutan", "rescue", "wildlife", "release", "conservation", "primate", "animal"]
     },
     {
       title: "Penyegelan Truk Kayu Bulat & Logging Liar",
+      title_en: "Seizure of Illegal Logging Fleet & Timber",
       category: "Galeri Rimba",
+      category_en: "Action Gallery",
       snippet: "Penyegelan barang bukti kayu curian dan alat berat oleh satuan Polisi Kehutanan.",
+      snippet_en: "Confiscation of stolen timber logs and heavy machinery by forestry law enforcement.",
       target: "#galeri-hutan",
       action: () => slideGalleryTo(1),
-      keywords: ["penyegelan", "truk logging", "alat berat", "sita", "tangkap", "gakkum", "kayu bulat"]
+      keywords: ["penyegelan", "truk logging", "alat berat", "sita", "tangkap", "gakkum", "kayu bulat"],
+      keywords_en: ["seizure", "confiscation", "logging truck", "heavy machinery", "illegal timber", "law enforcement"]
     },
     {
       title: "Operasi Pemadaman Karhutla Manggala Agni",
+      title_en: "Manggala Agni Wildfire Suppression",
       category: "Galeri Rimba",
+      category_en: "Action Gallery",
       snippet: "Perjuangan brigade damkar rimba menembus bara gambut di Sumatra dan Kalimantan.",
+      snippet_en: "Forest fire brigades extinguishing subterranean peat embers in Sumatra and Borneo.",
       target: "#galeri-hutan",
       action: () => slideGalleryTo(2),
-      keywords: ["pemadaman", "manggala agni", "pemadam", "brigade", "damkar", "asap pekat"]
+      keywords: ["pemadaman", "manggala agni", "pemadam", "brigade", "damkar", "asap pekat"],
+      keywords_en: ["suppression", "manggala agni", "firefighter", "brigade", "firefighting", "peat fire"]
     },
     {
       title: "Peta Hotspot & Sensor Satelit Api",
+      title_en: "Satellite Hotspot & Wildfire Map",
       category: "Peta Api",
+      category_en: "Hotspot Map",
       snippet: "Pemantauan koordinat suhu ekstrem dan titik bara aktif satelit NASA FIRMS & BMKG.",
+      snippet_en: "Monitoring thermal anomalies and active fire coordinates via NASA FIRMS & BMKG satellites.",
       target: "#peta-titik-api",
-      keywords: ["peta", "titik api", "hotspot", "satelit", "nasa", "modis", "viirs", "bmkg", "sipongi", "koordinat", "peta api"]
+      keywords: ["peta", "titik api", "hotspot", "satelit", "nasa", "modis", "viirs", "bmkg", "sipongi", "koordinat", "peta api"],
+      keywords_en: ["map", "hotspot", "hotspots", "satellite", "nasa", "firms", "viirs", "coordinates", "thermal"]
     },
     {
       title: "Kontak Posko Darurat Karhutla",
+      title_en: "Wildfire Emergency Command Contacts",
       category: "Posko Darurat",
+      category_en: "Emergency Contacts",
       snippet: "Hotline siaga Posko HutanKita (+62 838-4365-3251), Damkar 113, BPBD 112, dan Gakkum 110.",
+      snippet_en: "24/7 hotlines for HutanKita (+62 838-4365-3251), Fire Brigade 113, BPBD 112, and Police 110.",
       target: "#kontak-darurat",
-      keywords: ["kontak", "darurat", "posko", "telepon", "hotline", "bantuan", "nomor darurat", "nomor darurat karhutla"]
+      keywords: ["kontak", "darurat", "posko", "telepon", "hotline", "bantuan", "nomor darurat", "nomor darurat karhutla"],
+      keywords_en: ["contact", "contacts", "emergency", "command post", "hotline", "phone", "help", "report"]
     },
     {
       title: "Hotline WhatsApp Posko HutanKita",
+      title_en: "HutanKita Official WhatsApp Hotline",
       category: "Posko Darurat",
+      category_en: "Emergency Contacts",
       snippet: "Kanal pelaporan cepat kebakaran hutan langsung ke posko siaga terpadu HutanKita.",
+      snippet_en: "Rapid wildfire reporting channel directly to HutanKita's integrated command post.",
       target: "#kontak-darurat",
-      keywords: ["whatsapp", "posko", "083843653251", "lapor wa", "pengaduan", "wa"]
+      keywords: ["whatsapp", "posko", "083843653251", "lapor wa", "pengaduan", "wa"],
+      keywords_en: ["whatsapp", "hotline", "report", "command post", "official"]
     },
     {
       title: "Layanan Pemadam Kebakaran (Damkar 113)",
+      title_en: "Fire Brigade Emergency Service (Damkar 113)",
       category: "Posko Darurat",
+      category_en: "Emergency Contacts",
       snippet: "Panggilan darurat pemadam karhutla dan penanganan kedaruratan kebakaran permukiman.",
+      snippet_en: "Emergency call for forest wildfire suppression and urgent fire response.",
       target: "#kontak-darurat",
-      keywords: ["damkar", "113", "pemadam kebakaran", "pemadam", "siaga 113"]
+      keywords: ["damkar", "113", "pemadam kebakaran", "pemadam", "siaga 113"],
+      keywords_en: ["fire brigade", "firefighter", "damkar", "113", "fire department"]
     },
     {
       title: "Ikrar Komitmen Jaga Hutan Nusantara",
+      title_en: "Archipelago Rainforest Conservation Pledge",
       category: "Aksi Nyata",
+      category_en: "Take Action",
       snippet: "Deklarasikan komitmen nyata dan catat ikrar Anda untuk pelestarian hutan Indonesia.",
+      snippet_en: "Declare your tangible commitment and generate your official rainforest pledge certificate.",
       target: "#ajakan-jaga-hutan",
-      keywords: ["ikrar", "pledge", "komitmen", "dukungan", "deklarasi", "jaga hutan"]
+      keywords: ["ikrar", "pledge", "komitmen", "dukungan", "deklarasi", "jaga hutan"],
+      keywords_en: ["pledge", "commitment", "certificate", "action", "protect forest", "oath"]
     }
   ];
 
@@ -247,14 +348,39 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 2500);
 
     if (window.showToast) {
-      window.showToast("Membuka: " + title);
+      window.showToast((isEnglishLang() ? "Opening: " : "Membuka: ") + title);
     }
 
     closeSearchDropdown();
+    if (window.innerWidth <= 820) {
+      setSearchBarOpenState(false);
+    }
+  }
+
+  function buildSearchPillsMarkup(isEn) {
+    if (isEn) {
+      return `
+        <button type="button" class="search-hint-pill" data-hint="ironwood">Ironwood</button>
+        <button type="button" class="search-hint-pill" data-hint="wildfire">Wildfires</button>
+        <button type="button" class="search-hint-pill" data-hint="roots">3D Roots</button>
+        <button type="button" class="search-hint-pill" data-hint="fire brigade">Fire Brigade 113</button>
+        <button type="button" class="search-hint-pill" data-hint="law">Forestry Laws</button>
+        <button type="button" class="search-hint-pill" data-hint="orangutan">Orangutan</button>
+      `;
+    }
+    return `
+      <button type="button" class="search-hint-pill" data-hint="ulin">Pohon Ulin</button>
+      <button type="button" class="search-hint-pill" data-hint="karhutla">Karhutla</button>
+      <button type="button" class="search-hint-pill" data-hint="akar">Akar 3D</button>
+      <button type="button" class="search-hint-pill" data-hint="damkar">Damkar 113</button>
+      <button type="button" class="search-hint-pill" data-hint="sanksi">Sanksi UU</button>
+      <button type="button" class="search-hint-pill" data-hint="orangutan">Orangutan</button>
+    `;
   }
 
   function performSearch(rawQuery) {
     if (!searchResultsDropdown) return;
+    const isEn = isEnglishLang();
     const query = (rawQuery || "").trim().toLowerCase();
 
     if (!query) {
@@ -267,25 +393,29 @@ document.addEventListener("DOMContentLoaded", () => {
     if (searchClearBtn) searchClearBtn.classList.remove("hidden");
 
     const matches = SEARCH_DATABASE.filter((item) => {
-      const inTitle = item.title.toLowerCase().includes(query);
-      const inCat = item.category.toLowerCase().includes(query);
-      const inSnippet = item.snippet.toLowerCase().includes(query);
-      const inKeywords = item.keywords.some((k) => k.toLowerCase().includes(query));
+      const inTitle = item.title.toLowerCase().includes(query) ||
+        (item.title_en && item.title_en.toLowerCase().includes(query));
+      const inCat = item.category.toLowerCase().includes(query) ||
+        (item.category_en && item.category_en.toLowerCase().includes(query));
+      const inSnippet = item.snippet.toLowerCase().includes(query) ||
+        (item.snippet_en && item.snippet_en.toLowerCase().includes(query));
+      const inKeywords = item.keywords.some((k) => k.toLowerCase().includes(query)) ||
+        (item.keywords_en && item.keywords_en.some((k) => k.toLowerCase().includes(query)));
       return inTitle || inCat || inSnippet || inKeywords;
     });
 
     if (matches.length === 0) {
+      const noResText = isEn
+        ? `No results found for "<strong>${escapeHtml(rawQuery)}</strong>"`
+        : `Tidak ditemukan materi untuk "<strong>${escapeHtml(rawQuery)}</strong>"`;
+      const suggestLabel = isEn ? "Search suggestions:" : "Rekomendasi pencarian:";
+
       searchResultsDropdown.innerHTML = `
         <div class="search-no-results">
-          <span>Tidak ditemukan materi untuk "<strong>${escapeHtml(rawQuery)}</strong>"</span>
+          <span>${noResText}</span>
           <div class="search-suggestions-wrap">
-            <span class="search-suggestions-label">Rekomendasi pencarian:</span>
-            <button type="button" class="search-hint-pill" data-hint="ulin">Pohon Ulin</button>
-            <button type="button" class="search-hint-pill" data-hint="karhutla">Karhutla</button>
-            <button type="button" class="search-hint-pill" data-hint="akar">Akar 3D</button>
-            <button type="button" class="search-hint-pill" data-hint="damkar">Damkar 113</button>
-            <button type="button" class="search-hint-pill" data-hint="sanksi">Sanksi UU</button>
-            <button type="button" class="search-hint-pill" data-hint="orangutan">Orangutan</button>
+            <span class="search-suggestions-label">${suggestLabel}</span>
+            ${buildSearchPillsMarkup(isEn)}
           </div>
         </div>
       `;
@@ -304,27 +434,33 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    const headerTitle = isEn ? `Search Results (${matches.length})` : `Hasil Pencarian (${matches.length})`;
+    const clickHint = isEn ? "Click to jump" : "Klik untuk menuju";
+
     let html = `
       <div class="search-dropdown-header">
-        <span>Hasil Pencarian (${matches.length})</span>
-        <span style="font-size:0.7rem; color:rgba(255,255,255,0.4);">Klik untuk menuju</span>
+        <span>${headerTitle}</span>
+        <span style="font-size:0.7rem; color:rgba(255,255,255,0.4);">${clickHint}</span>
       </div>
     `;
 
     matches.slice(0, 8).forEach((item, idx) => {
-      const highlightedTitle = highlightKeyword(item.title, query);
+      const displayTitle = isEn && item.title_en ? item.title_en : item.title;
+      const displayCat = isEn && item.category_en ? item.category_en : item.category;
+      const displaySnippet = isEn && item.snippet_en ? item.snippet_en : item.snippet;
+      const highlightedTitle = highlightKeyword(displayTitle, query);
       html += `
         <button class="search-result-item" type="button" data-index="${idx}">
           <div class="search-item-top">
             <span class="search-item-title">${highlightedTitle}</span>
-            <span class="search-item-category">${escapeHtml(item.category)}</span>
+            <span class="search-item-category">${escapeHtml(displayCat)}</span>
             <div class="search-item-arrow" aria-hidden="true">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="9 18 15 12 9 6"></polyline>
               </svg>
             </div>
           </div>
-          <p class="search-item-snippet">${escapeHtml(item.snippet)}</p>
+          <p class="search-item-snippet">${escapeHtml(displaySnippet)}</p>
         </button>
       `;
     });
@@ -337,7 +473,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const idx = parseInt(btn.getAttribute("data-index"), 10);
         const item = matches[idx];
         if (item) {
-          highlightAndScroll(item.target, item.action, item.title);
+          const displayTitle = isEn && item.title_en ? item.title_en : item.title;
+          highlightAndScroll(item.target, item.action, displayTitle);
         }
       });
     });
@@ -345,16 +482,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function showInitialRecommendations() {
     if (!searchResultsDropdown) return;
+    const isEn = isEnglishLang();
+    const recLabel = isEn ? "Recommended keywords:" : "Rekomendasi kata kunci:";
+
     searchResultsDropdown.innerHTML = `
       <div class="search-no-results">
-        <span class="search-suggestions-label">Rekomendasi kata kunci:</span>
+        <span class="search-suggestions-label">${recLabel}</span>
         <div class="search-suggestions-wrap">
-          <button type="button" class="search-hint-pill" data-hint="ulin">Pohon Ulin</button>
-          <button type="button" class="search-hint-pill" data-hint="karhutla">Karhutla</button>
-          <button type="button" class="search-hint-pill" data-hint="akar">Akar 3D</button>
-          <button type="button" class="search-hint-pill" data-hint="damkar">Damkar 113</button>
-          <button type="button" class="search-hint-pill" data-hint="sanksi">Sanksi UU</button>
-          <button type="button" class="search-hint-pill" data-hint="orangutan">Orangutan</button>
+          ${buildSearchPillsMarkup(isEn)}
         </div>
       </div>
     `;
@@ -371,6 +506,16 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
   }
+
+  window.addEventListener("hk:languagechange", () => {
+    if (searchResultsDropdown && searchResultsDropdown.classList.contains("is-active") && searchInput) {
+      if (searchInput.value.trim()) {
+        performSearch(searchInput.value);
+      } else {
+        showInitialRecommendations();
+      }
+    }
+  });
 
   function highlightKeyword(text, keyword) {
     if (!keyword) return escapeHtml(text);
@@ -409,7 +554,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const val = searchInput.value.trim();
 
       if (!isOpen) {
-        searchInput.classList.add("open");
+        setSearchBarOpenState(true);
         searchInput.focus();
         if (val) {
           performSearch(val);
@@ -425,7 +570,7 @@ document.addEventListener("DOMContentLoaded", () => {
             performSearch(val);
           }
         } else {
-          searchInput.classList.remove("open");
+          setSearchBarOpenState(false);
           closeSearchDropdown();
         }
       }
@@ -455,7 +600,7 @@ document.addEventListener("DOMContentLoaded", () => {
           performSearch(searchInput.value);
         }
       } else if (e.key === "Escape") {
-        searchInput.classList.remove("open");
+        setSearchBarOpenState(false);
         closeSearchDropdown();
         searchInput.blur();
       }
@@ -466,7 +611,7 @@ document.addEventListener("DOMContentLoaded", () => {
         e.stopPropagation();
         searchInput.value = "";
         searchClearBtn.classList.add("hidden");
-        closeSearchDropdown();
+        showInitialRecommendations();
         searchInput.focus();
       });
     }
@@ -474,8 +619,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.addEventListener("click", (e) => {
       if (!e.target.closest(".search-box")) {
         closeSearchDropdown();
-        if (!searchInput.value.trim()) {
-          searchInput.classList.remove("open");
+        if (!searchInput.value.trim() || window.innerWidth <= 820) {
+          setSearchBarOpenState(false);
         }
       }
     });
@@ -521,6 +666,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let currentMapMode = "3d"; // "3d" | "explanation"
 
+  function updateMapModeLabels() {
+    const isEn = isEnglishLang();
+    if (currentMapMode === "explanation") {
+      if (actionBtnLabel) {
+        actionBtnLabel.textContent = isEn ? "Return to 3D Relief Model" : "Kembali ke Model 3D Relief";
+      }
+      if (hintBadgeText) {
+        hintBadgeText.textContent = isEn ? "Click map to return to 3D relief" : "Klik peta untuk kembali ke 3D relief";
+      }
+    } else {
+      if (actionBtnLabel) {
+        actionBtnLabel.textContent = isEn ? "Open Data Explanation Map" : "Buka Peta Penjelasan Data";
+      }
+      if (hintBadgeText) {
+        hintBadgeText.textContent = isEn ? "Click map to view regional canopy data" : "Klik peta untuk melihat data penjelasan wilayah";
+      }
+    }
+  }
+
   function setMapMode(mode) {
     if (mode === currentMapMode) return;
     currentMapMode = mode;
@@ -532,9 +696,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       btnSwitchTo3D.classList.remove("active");
       btnSwitchToExplanation.classList.add("active");
-
-      if (actionBtnLabel) actionBtnLabel.textContent = "Kembali ke 3D Relief";
-      if (hintBadgeText) hintBadgeText.textContent = "Klik peta untuk kembali ke 3D relief";
     } else {
       // Tampilkan Peta 3D Relief (assets/images/peta.webp)
       viewExplanationLayer.classList.remove("active");
@@ -542,11 +703,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
       btnSwitchToExplanation.classList.remove("active");
       btnSwitchTo3D.classList.add("active");
-
-      if (actionBtnLabel) actionBtnLabel.textContent = "Buka Peta Penjelasan Data";
-      if (hintBadgeText) hintBadgeText.textContent = "Klik peta untuk melihat data penjelasan wilayah";
     }
+    updateMapModeLabels();
   }
+
+  window.addEventListener("hk:languagechange", updateMapModeLabels);
 
   // Klik tombol switcher pill
   if (btnSwitchTo3D) {
@@ -865,7 +1026,9 @@ document.addEventListener("DOMContentLoaded", () => {
       imgMain: "assets/images/akar1.webp",
       imgSecondary: "assets/images/akar2.webp",
       struktur: "Sistem perakaran pohon raksasa hutan tropis ditopang oleh akar banir (buttress root) yang memipih melebar di atas tanah humus dangkal, diperkuat lapisan epidermis luar dan tudung akar (kaliptra) yang menembus sela bebatuan. Di dalamnya, silinder pusat vaskular (stele) tersusun atas pembuluh xilem berdinding tebal berlignin dan tapis floem yang dikelilingi pita Caspary pada endodermis untuk menyaring nutrisi mineral tanah, bersimbiosis erat dengan jaringan hifa jamur mikoriza yang memperluas jangkauan penyerapan air hingga ratusan meter.",
+      struktur_en: "The giant root system of tropical rainforest trees is anchored by expansive buttress roots spreading horizontally across shallow topsoil, reinforced by an outer epidermis and root caps (calyptra) penetrating between rocks. Internally, the vascular cylinder (stele) comprises thick-walled, lignified xylem vessels and phloem sieve tubes surrounded by the Casparian strip on the endodermis to filter mineral nutrients, forming close symbiotic partnerships with mycorrhizal fungal hyphae that extend water absorption reach across hundreds of meters.",
       manfaat: "Bagi lingkungan, jalinan perakaran masif ini berfungsi sebagai jangkar geologis terkuat yang mencengkeram tanah lereng terjal, secara efektif mencegah longsor dan erosi saat diterpa curah hujan ekstrem khatulistiwa. Jaringan akar juga bertindak sebagai spons raksasa alami yang menginfiltrasi dan mengunci cadangan air tawar ke dalam akuifer tanah, mencegah banjir bandang di hilir, serta memelihara kesuburan tanah hutan melalui perputaran mikroorganisme pengurai bahan organik.",
+      manfaat_en: "For the environment, this massive root network acts as a formidable geological anchor securing steep slope terrain, effectively preventing landslides and erosion during extreme equatorial rainfalls. It operates as a giant natural sponge, infiltrating and locking freshwater into underground aquifers, curbing downstream flash floods, and maintaining soil fertility through continuous microbial decomposition cycles.",
       camPos: { x: 0, y: -7.8, z: 12.0 },
       lookAt: { x: 0, y: -8.2, z: 0 },
       fallbackTransform: "scale(2.35) translate(0%, -32%)",
@@ -874,7 +1037,9 @@ document.addEventListener("DOMContentLoaded", () => {
       imgMain: "assets/images/batang1.webp",
       imgSecondary: "assets/images/batang2.webp",
       struktur: "Batang pohon emergent tersusun atas formasi cincin konsentris berarsitektur kokoh. Lapisan terluar berupa ritidom (kulit kayu mati bergabus) dan periderm pelindung yang kedap patogen, disusul lapisan floem sekunder yang menyalurkan fotosintat ke bawah. Tepat di bawahnya, cincin meristem kambium vaskular aktif membelah membentuk kayu gubal (sapwood) yang menyalurkan ribuan liter air ke ketinggian 60 meter, sedangkan inti terdalamnya adalah kayu teras (heartwood) padat dengan timbunan senyawa resin, tanin, dan lignin tua berkekuatan tarik luar biasa.",
+      struktur_en: "The emergent tree trunk consists of concentric rings of robust architecture. The outermost layer is the rhytidome (corky dead bark) and pathogen-resistant periderm, followed by secondary phloem distributing photosynthates downward. Directly beneath lies the active vascular cambium generating sapwood that channels thousands of liters of water up to 60 meters, while the core heartwood is densely packed with resins, tannins, and aged lignin possessing tremendous tensile strength.",
       manfaat: "Bagi lingkungan, batang raksasa ini merupakan rosot karbon alami (carbon sink) terpenting di muka bumi, yang mampu mengunci puluhan hingga ratusan ton karbon dioksida atmosfer dalam wujud biomassa padat selama berabad-abad. Selain menopang struktur kubah kanopi pelindung iklim mikro, volume batang kayu tua menjadi penahan cadangan kelembapan udara hutan tropis, meredam panas permukaan bumi, dan menyediakan mikronutrien penting bagi ribuan spesies lumut, jamur, serta serangga dekomposer penyeimbang ekosistem.",
+      manfaat_en: "Environmentally, this massive trunk serves as one of the planet's most critical carbon sinks, locking tens to hundreds of tons of atmospheric carbon dioxide in dense biomass for centuries. Beyond supporting the microclimate canopy dome, its aged wood volume retains forest humidity, buffers terrestrial surface heat, and provides essential micronutrients for thousands of moss, fungal, and decomposer species.",
       camPos: { x: 0, y: -1.5, z: 11.5 },
       lookAt: { x: 0, y: -1.5, z: 0 },
       fallbackTransform: "scale(2.35) translate(0%, -8%)",
@@ -883,7 +1048,9 @@ document.addEventListener("DOMContentLoaded", () => {
       imgMain: "assets/images/dahan1.webp",
       imgSecondary: "assets/images/dahan2.webp",
       struktur: "Percabangan dahan dirancang secara biomekanis melalui pola simpodial fleksibel dengan penguatan serat kayu tegangan tinggi (tension wood) pada pangkal nodus dahan untuk menahan torsi angin kencang. Kulit dahan dilapisi lentisel mikro sebagai pertukaran gas respirasi selular, menyelimuti silinder xilem sekunder berpori yang mengalirkan air ke ranting-ranting terluar. Permukaan kulit dahan yang tebal dan lembap membentuk stratum substrat organik alami yang menampung tumpukan seresah mikro dan humus gantung.",
+      struktur_en: "Branching is biomechanically engineered via flexible sympodial patterns reinforced with high-tension wood fibers at nodal junctions to withstand storm torque. Bark is aerated with micro-lenticels for cellular respiration, encasing porous secondary xylem supplying outer twigs. The thick, humid bark stratum creates a natural substrate supporting aerial humus and micro-litter deposits.",
       manfaat: "Bagi lingkungan, dahan-dahan kanopi membentuk ekosistem bertingkat atau 'taman gantung udara' yang menjadi habitat bagi ribuan tanaman epifit seperti anggrek hutan, paku sarang burung, dan lumut yang menyaring partikel udara. Percabangan ini berfungsi sebagai koridor mobilitas dan jembatan jelajah esensial bagi satwa kanopi langka—seperti Orangutan, Owa, serta Rangkong—sekaligus memecah kecepatan terpaan angin badai tropis sehingga lantai hutan di bawahnya tetap teduh, tenang, dan stabil.",
+      manfaat_en: "In the ecosystem, canopy branches form a multi-tiered 'hanging garden' harboring thousands of epiphytes like wild orchids, bird's nest ferns, and air-filtering mosses. This framework serves as a vital transit corridor for canopy wildlife—such as Orangutans, Gibbons, and Hornbills—while breaking gale-force winds so the forest floor below remains serene and sheltered.",
       camPos: { x: 0, y: 3.2, z: 12.0 },
       lookAt: { x: 0, y: 3.2, z: 0 },
       fallbackTransform: "scale(2.25) translate(0%, 14%)",
@@ -892,7 +1059,9 @@ document.addEventListener("DOMContentLoaded", () => {
       imgMain: "assets/images/daun1.webp",
       imgSecondary: "assets/images/daun2.webp",
       struktur: "Daun hutan hujan tropis merupakan instrumen konversi energi surya dengan struktur seluler berlapis. Permukaan atasnya dilapisi kutikula lilin mengilap dan berujung menetes (drip tips) agar air hujan lebat segera mengalir turun tanpa membusukkan helai daun. Di bawah epidermis transparan terdapat jaringan tiang palisade yang padat akan butir kloroplas kaya klorofil untuk fotosintesis, ditopang jaringan spons bervakuola dan tulang daun berurat vaskular rapat, serta ribuan stomata berpasang sel penjaga di permukaan bawah untuk regulasi transpirasi gas.",
+      struktur_en: "Tropical rainforest leaves are solar conversion instruments with multi-layered cellular anatomy. The upper surface features glossy waxy cuticles with pronounced drip tips shedding heavy rain before rot occurs. Below the transparent epidermis sits palisade mesophyll packed with chlorophyll-rich chloroplasts for photosynthesis, supported by spongy parenchyma, dense vascular venation, and thousands of lower-surface stomata regulated by guard cells for transpiration.",
       manfaat: "Bagi lingkungan, kanopi daun bertindak sebagai 'paru-paru hijau' global yang mengonversi karbon dioksida menjadi jutaan ton pasokan oksigen murni, sekaligus menahan energi kinetik tetesan air hujan lebat agar tidak mengikis tanah secara langsung. Melalui proses transpirasi harian, triliunan lembar daun mengembuskan miliaran liter uap air ke atmosfer, membentuk siklus awan dan presipitasi hujan lokal yang mendinginkan suhu khatulistiwa serta menstabilkan cuaca regional di seluruh Asia Tenggara.",
+      manfaat_en: "The leaf canopy acts as the globe's 'green lungs,' converting carbon dioxide into millions of tons of pure oxygen while absorbing the kinetic energy of torrential rains to prevent soil erosion. Through daily transpiration, trillions of leaves release billions of liters of moisture, powering cloud cycles and precipitation that cool equatorial temperatures and stabilize regional weather across Southeast Asia.",
       camPos: { x: 0, y: 7.6, z: 12.5 },
       lookAt: { x: 0, y: 7.6, z: 0 },
       fallbackTransform: "scale(2.2) translate(0%, 28%)",
@@ -976,10 +1145,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Update Deskripsi Murni (Struktur Bagian & Manfaat bagi Lingkungan)
         if (detailPureDesc) {
-          if (info.struktur && info.manfaat) {
+          const isEn = typeof window.getHkLanguage === "function" && window.getHkLanguage() === "en";
+          const structLabel = isEn ? "Structural Layers:" : "Struktur Bagian:";
+          const benefitLabel = isEn ? "Environmental Benefits:" : "Manfaat bagi Lingkungan:";
+          const structText = isEn && info.struktur_en ? info.struktur_en : info.struktur;
+          const benefitText = isEn && info.manfaat_en ? info.manfaat_en : info.manfaat;
+
+          if (structText && benefitText) {
             detailPureDesc.innerHTML = `
-              <p class="desc-paragraph"><strong class="desc-lead-label">Struktur Bagian:</strong> ${info.struktur}</p>
-              <p class="desc-paragraph"><strong class="desc-lead-label">Manfaat bagi Lingkungan:</strong> ${info.manfaat}</p>
+              <p class="desc-paragraph"><strong class="desc-lead-label">${structLabel}</strong> ${structText}</p>
+              <p class="desc-paragraph"><strong class="desc-lead-label">${benefitLabel}</strong> ${benefitText}</p>
             `;
           } else if (info.desc) {
             detailPureDesc.innerHTML = `<p class="desc-paragraph">${info.desc}</p>`;
@@ -997,6 +1172,13 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
   }
+
+  // Sinkronisasi bahasa pada detail drawer pohon 3D jika sedang terbuka
+  window.addEventListener("hk:languagechange", () => {
+    if (activeTreePart && activeTreePart !== "utuh" && treeDetailDrawer && treeDetailDrawer.classList.contains("active")) {
+      selectTreePart(activeTreePart, false);
+    }
+  });
 
   // Event Listener Tombol Navigasi Bagian Pohon
   partButtons.forEach((btn) => {
@@ -1440,6 +1622,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const accordionHeaders = document.querySelectorAll(".penalty-accordion-header");
 
   if (accordionHeaders.length > 0) {
+    const syncAccordionActionTexts = () => {
+      const isEn = isEnglishLang();
+      accordionHeaders.forEach((header) => {
+        const card = header.closest(".penalty-accordion-card");
+        const actionText = header.querySelector(".chevron-action-text");
+        if (!card || !actionText) return;
+        const isOpen = card.classList.contains("open");
+        actionText.textContent = isOpen ? (isEn ? "Close" : "Tutup") : (isEn ? "Details" : "Detail");
+      });
+    };
+
     accordionHeaders.forEach((header) => {
       header.addEventListener("click", () => {
         const card = header.closest(".penalty-accordion-card");
@@ -1447,18 +1640,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const isOpen = card.classList.contains("open");
         const actionText = header.querySelector(".chevron-action-text");
+        const isEn = isEnglishLang();
 
         if (isOpen) {
           card.classList.remove("open");
           header.setAttribute("aria-expanded", "false");
-          if (actionText) actionText.textContent = "Detail";
+          if (actionText) actionText.textContent = isEn ? "Details" : "Detail";
         } else {
           card.classList.add("open");
           header.setAttribute("aria-expanded", "true");
-          if (actionText) actionText.textContent = "Tutup";
+          if (actionText) actionText.textContent = isEn ? "Close" : "Tutup";
         }
       });
     });
+
+    window.addEventListener("hk:languagechange", syncAccordionActionTexts);
   }
 
   /* ==========================================================================
@@ -2441,6 +2637,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Helper membuat pop-up ringkas & langsung to-the-point (Pure SVG Icons, No Emojis)
   function createPopupHTML(spot) {
+    const isEn = isEnglishLang();
     const isCritical = spot.status === "critical";
     const badgeClass = isCritical ? "badge-danger" : (spot.isPeat ? "badge-amber" : "badge-emerald");
     const heatColor = isCritical ? "#f87171" : (spot.isPeat ? "#fbbf24" : "#34d399");
@@ -2448,29 +2645,55 @@ document.addEventListener("DOMContentLoaded", () => {
     const latFixed = spot.lat.toFixed(4);
     const lngFixed = spot.lng.toFixed(4);
 
+    const statusLabelText = isEn
+      ? (spot.statusLabel === "Kritis Ekstrem"
+          ? "Extreme Critical"
+          : (spot.statusLabel === "Kubah Gambut" ? "Peat Dome" : spot.statusLabel))
+      : spot.statusLabel;
+
+    let ecoText = spot.ecosystem;
+    if (isEn) {
+      if (spot.ecosystem === "Tegakan Hutan & Konsesi Rawan Api") {
+        ecoText = "Fire-Prone Forest Stands & Concessions";
+      } else if (spot.ecosystem === "Kesatuan Hidrologis Gambut (KHG)") {
+        ecoText = "Peatland Hydrological Unit (KHG)";
+      }
+    }
+
+    const spotTitle = isEn && typeof spot.name === "string"
+      ? spot.name.replace(/^Titik\s+/, "Point ")
+      : spot.name;
+
+    const ecoLabel = isEn ? "Ecosystem:" : "Ekosistem:";
+    const frpLabel = isEn ? "Heat Radiation:" : "Radiasi Panas:";
+    const callLabel = isEn ? "Call Fire Brigade 113" : "Panggil Damkar 113";
+    const waLabel = isEn ? "Report via WA" : "Lapor WA Posko";
+    const copyLabel = isEn ? "Copy Coordinates" : "Salin Koordinat";
+    const copyToast = isEn ? "GPS coordinates copied!" : "Koordinat GPS disalin!";
+
     return `
       <div class="simple-hotspot-bubble">
         <div class="bubble-header">
-          <span class="hotspot-badge-pill ${badgeClass}">${spot.statusLabel}</span>
+          <span class="hotspot-badge-pill ${badgeClass}">${statusLabelText}</span>
           <span class="bubble-time">${spot.time}</span>
         </div>
-        <h4 class="bubble-title">${spot.name}</h4>
+        <h4 class="bubble-title">${spotTitle}</h4>
         <div class="bubble-info-row">
-          <div>Ekosistem: <strong>${spot.ecosystem}</strong></div>
-          <div>Radiasi Panas: <strong style="color: ${heatColor};">${spot.frp} MW</strong></div>
+          <div>${ecoLabel} <strong>${ecoText}</strong></div>
+          <div>${frpLabel} <strong style="color: ${heatColor};">${spot.frp} MW</strong></div>
         </div>
         <div class="bubble-actions">
           <a href="tel:113" class="btn-bubble-call">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-            <span>Panggil Damkar 113</span>
+            <span>${callLabel}</span>
           </a>
           <a href="https://wa.me/6283843653251?text=Halo%20Posko%20HutanKita%2C%20saya%20melihat%20titik%20api%20di%20${encodeURIComponent(spot.name)}%20(GPS%3A%20${latFixed}%2C%20${lngFixed})" target="_blank" rel="noopener noreferrer" class="btn-bubble-wa">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
-            <span>Lapor WA Posko</span>
+            <span>${waLabel}</span>
           </a>
-          <button class="btn-bubble-copy" onclick="window.copyToClipboard('${latFixed}, ${lngFixed}', 'Koordinat GPS disalin!')" type="button">
+          <button class="btn-bubble-copy" onclick="window.copyToClipboard('${latFixed}, ${lngFixed}', '${copyToast}')" type="button">
             <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-            <span>Salin Koordinat</span>
+            <span>${copyLabel}</span>
           </button>
         </div>
       </div>
@@ -2479,6 +2702,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Render Markers & Update Ringkasan Filter (Sinkronisasi Penuh Lokasi Klaster & Status Titik Api)
   function renderHotspots() {
+    const isEn = isEnglishLang();
     const filtered = currentHotspots.filter((spot) => {
       if (activeFilter === "critical") return spot.status === "critical";
       if (activeFilter === "peat") return spot.isPeat === true;
@@ -2501,13 +2725,25 @@ document.addEventListener("DOMContentLoaded", () => {
     if (dropCountPeat) dropCountPeat.textContent = peatCount;
     if (dropCountCrit) dropCountCrit.textContent = criticalCount;
 
+    const statusLabels = isEn
+      ? { all: "All Hotspots", peat: "Peat Domes", critical: "Extreme Critical" }
+      : { all: "Semua Titik", peat: "Kubah Gambut", critical: "Kritis Ekstrem" };
+
+    document.querySelectorAll("#dropdownStatusMenu .dropdown-item").forEach((item) => {
+      const st = item.getAttribute("data-status");
+      const lblEl = item.querySelector(".hk-status-label");
+      if (lblEl && statusLabels[st]) {
+        lblEl.textContent = statusLabels[st];
+      }
+    });
+
     if (floatingStatusVal) {
       if (activeFilter === "critical") {
-        floatingStatusVal.innerHTML = `Kritis Ekstrem (<span id="simpleCountAll">${criticalCount}</span>)`;
+        floatingStatusVal.innerHTML = `${statusLabels.critical} (<span id="simpleCountAll">${criticalCount}</span>)`;
       } else if (activeFilter === "peat") {
-        floatingStatusVal.innerHTML = `Kubah Gambut (<span id="simpleCountAll">${peatCount}</span>)`;
+        floatingStatusVal.innerHTML = `${statusLabels.peat} (<span id="simpleCountAll">${peatCount}</span>)`;
       } else {
-        floatingStatusVal.innerHTML = `Semua Titik (<span id="simpleCountAll">${totalCount}</span>)`;
+        floatingStatusVal.innerHTML = `${statusLabels.all} (<span id="simpleCountAll">${totalCount}</span>)`;
       }
     }
 
@@ -2537,13 +2773,37 @@ document.addEventListener("DOMContentLoaded", () => {
     if (elRegPapua) elRegPapua.textContent = countRegPapua;
     if (elRegJawa) elRegJawa.textContent = countRegJawa;
 
+    const regionNames = isEn
+      ? {
+          all: "All Regions",
+          sumatra: "Sumatra — Riau & Jambi",
+          kalimantan: "Borneo — Central & West Kalimantan",
+          papua: "Papua & Maluku",
+          jawa: "Java & Nusa Tenggara"
+        }
+      : {
+          all: "Semua Wilayah",
+          sumatra: "Sumatera — Riau & Jambi",
+          kalimantan: "Kalimantan — Kalteng & Kalbar",
+          papua: "Papua & Maluku",
+          jawa: "Jawa & Nusa Tenggara"
+        };
+
+    document.querySelectorAll("#dropdownRegionMenu .dropdown-item").forEach((item) => {
+      const reg = item.getAttribute("data-region");
+      const lblEl = item.querySelector(".hk-region-label");
+      if (lblEl && regionNames[reg]) {
+        lblEl.textContent = regionNames[reg];
+      }
+    });
+
     if (floatingRegionVal) {
       const regionTitles = {
-        all: `Semua Wilayah (${countRegAll})`,
-        sumatra: `Sumatera — Riau & Jambi (${countRegSumatra})`,
-        kalimantan: `Kalimantan — Kalteng & Kalbar (${countRegKalimantan})`,
-        papua: `Papua & Maluku (${countRegPapua})`,
-        jawa: `Jawa & Nusa Tenggara (${countRegJawa})`
+        all: `${regionNames.all} (${countRegAll})`,
+        sumatra: `${regionNames.sumatra} (${countRegSumatra})`,
+        kalimantan: `${regionNames.kalimantan} (${countRegKalimantan})`,
+        papua: `${regionNames.papua} (${countRegPapua})`,
+        jawa: `${regionNames.jawa} (${countRegJawa})`
       };
       floatingRegionVal.textContent = regionTitles[activeRegionFilter] || regionTitles.all;
     }
@@ -2568,6 +2828,10 @@ document.addEventListener("DOMContentLoaded", () => {
       hotspotMarkersLayer.addLayer(marker);
     });
   }
+
+  window.addEventListener("hk:languagechange", () => {
+    renderHotspots();
+  });
 
   // HK-PATCH: Inisialisasi Leaflet & tile Esri ditunda sampai section #peta-titik-api mendekati viewport
   function initHotspotLeafletMap(onReady) {
@@ -2714,7 +2978,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             if (typeof window.showToast === "function") {
-              window.showToast(`Fokus peta: ${regionLabel}`);
+              window.showToast((isEnglishLang() ? "Map focus: " : "Fokus peta: ") + regionLabel);
             }
           });
         });
@@ -2747,16 +3011,22 @@ document.addEventListener("DOMContentLoaded", () => {
             renderHotspots();
 
             if (typeof window.showToast === "function") {
+              const isEn = isEnglishLang();
               if (activeFilter === "peat" && currentHotspots.filter((s) => s.isPeat).length === 0) {
-                window.showToast("Data CSV NASA FIRMS tidak memuat atribut gambut (0 titik).");
+                window.showToast(isEn ? "NASA FIRMS CSV data has no peatland attribute (0 hotspots)." : "Data CSV NASA FIRMS tidak memuat atribut gambut (0 titik).");
               } else {
-                const filterLabel =
-                  activeFilter === "critical"
-                    ? "Kritis Ekstrem"
-                    : activeFilter === "peat"
-                    ? "Kubah Gambut"
-                    : "Semua Titik";
-                window.showToast(`Menampilkan: ${filterLabel}`);
+                const filterLabel = isEn
+                  ? (activeFilter === "critical"
+                      ? "Extreme Critical"
+                      : activeFilter === "peat"
+                      ? "Peat Domes"
+                      : "All Hotspots")
+                  : (activeFilter === "critical"
+                      ? "Kritis Ekstrem"
+                      : activeFilter === "peat"
+                      ? "Kubah Gambut"
+                      : "Semua Titik");
+                window.showToast((isEn ? "Showing: " : "Menampilkan: ") + filterLabel);
               }
             }
           });
@@ -2777,8 +3047,9 @@ document.addEventListener("DOMContentLoaded", () => {
       btnResetZoom.addEventListener("click", () => {
         activeFilter = "all";
         activeRegionFilter = "all";
+        const isEn = isEnglishLang();
         const valRegion = document.getElementById("floatingRegionVal");
-        if (valRegion) valRegion.textContent = "Semua Wilayah (Nusantara)";
+        if (valRegion) valRegion.textContent = isEn ? "All Regions (Archipelago)" : "Semua Wilayah (Nusantara)";
         if (dropdownRegionMenu) {
           dropdownRegionMenu.querySelectorAll(".dropdown-item").forEach((it) => it.classList.toggle("active", it.getAttribute("data-region") === "all"));
         }
@@ -2792,7 +3063,7 @@ document.addEventListener("DOMContentLoaded", () => {
           leafletMapInstance.flyTo([-1.5, 117.5], 5, { duration: 1.2 });
           renderHotspots();
           if (typeof window.showToast === "function") {
-            window.showToast("Tampilan peta Indonesia dipusatkan kembali.");
+            window.showToast(isEn ? "Indonesia map view re-centered." : "Tampilan peta Indonesia dipusatkan kembali.");
           }
         });
       });
@@ -2814,44 +3085,68 @@ document.addEventListener("DOMContentLoaded", () => {
   const GALLERY_DETAIL_DATA = [
     {
       title: "Penyisiran Zona Inti Rimba",
+      title_en: "Core Rainforest Zone Patrol",
       tag: "Patroli Kawasan",
+      tag_en: "Area Patrol",
       desc: "Operasi terpadu polisi kehutanan menyusuri batas taman nasional untuk membongkar jerat satwa liar dan mencegah perambahan lahan konsesi.",
+      desc_en: "Joint forest police operations patrolling national park boundaries to dismantle snares and prevent illegal concession encroachment.",
       extra: "Patroli berkala ini melibatkan masyarakat mitra kehutanan (MMP) untuk memetakan jalur lintasan satwa dan menjaga keutuhan 120+ juta hektar tutupan kanopi alami nusantara.",
+      extra_en: "Periodic patrols engage local forestry partners (MMP) to map wildlife corridors and safeguard 120+ million hectares of natural canopy.",
       theme: "emerald"
     },
     {
       title: "Pemadaman Bara Gambut",
+      title_en: "Subterranean Peat Fire Suppression",
       tag: "Operasi Karhutla",
+      tag_en: "Wildfire Operation",
       desc: "Satuan Manggala Agni memadamkan api bawah tanah di kubah gambut yang rawan menjalar luas saat musim kemarau ekstrem.",
+      desc_en: "Manggala Agni brigades dousing underground smoldering fires across peat domes vulnerable during extreme dry seasons.",
       extra: "Pemadaman lahan gambut membutuhkan teknik penyuntikan air bertekanan tinggi hingga kedalaman 4-8 meter di bawah permukaan untuk mematikan sisa bara pembakaran biomassa.",
+      extra_en: "Peat firefighting requires high-pressure water injection up to 4-8 meters deep to extinguish smoldering biomass embers.",
       theme: "emerald"
     },
     {
       title: "Evakuasi & Pelepasliaran Orangutan",
+      title_en: "Orangutan Rescue & Release",
       tag: "Konservasi Satwa",
+      tag_en: "Fauna Conservation",
       desc: "Penyelamatan induk dan bayi orangutan dari areal terdampak menuju stasiun rehabilitasi dan suaka hutan lindung alami.",
+      desc_en: "Rescuing mother and infant orangutans from affected areas to rehabilitation stations and natural protected forest reserves.",
       extra: "Orangutan (Pongo pygmaeus & Pongo abelii) merupakan spesies payung penyebar biji hutan tropis yang sangat krusial dalam regenerasi vegetasi pohon purba alami.",
+      extra_en: "Orangutans (Pongo pygmaeus & Pongo abelii) are keystone seed dispersers vital for the natural regeneration of ancient tropical trees.",
       theme: "emerald"
     },
     {
       title: "Penyitaan Armada & Kayu Ilegal",
+      title_en: "Seizure of Illegal Logs & Fleet",
       tag: "Gakkum Kehutanan",
+      tag_en: "Forest Law Enforcement",
       desc: "Penyegelan barang bukti buldoser, truk logging, dan ribuan batang kayu bulat hasil operasi tangkap tangan pembalakan liar.",
+      desc_en: "Confiscation of bulldozers, logging trucks, and thousands of round timber logs from undercover illegal logging operations.",
       extra: "Gakkum KLHK berkoordinasi dengan Polri dan TNI memberlakukan sanksi pidana UU No. 18 Tahun 2013 hingga 15 tahun kurungan dan denda Rp 100 miliar bagi korporasi dan cukong kayu.",
+      extra_en: "KLHK Law Enforcement coordinates with Police and Military to enforce Law No. 18/2013 penalties of up to 15 years prison and IDR 100B fines.",
       theme: "danger"
     },
     {
       title: "Deteksi Titik Api Real-Time",
+      title_en: "Real-Time Satellite Thermal Detection",
       tag: "Satelit Radar",
+      tag_en: "Satellite Radar",
       desc: "Pengawasan spasial resolusi tinggi untuk mendeteksi anomali suhu dan pembukaan tutupan tajuk pohon secara seketika dari orbit.",
+      desc_en: "High-resolution orbital surveillance detecting temperature anomalies and sudden canopy openings directly from space.",
       extra: "Data radar satelit VIIRS SNPP 375m dan MODIS Terra/Aqua terintegrasi secara otomatis ke sistem monitoring Sipongi+ untuk peringatan dini sebelum bara membesar.",
+      extra_en: "VIIRS SNPP 375m and MODIS Terra/Aqua radar data feed automatically into Sipongi+ early warning systems before flames spread.",
       theme: "emerald"
     },
     {
       title: "Penanaman Pohon Endemik",
+      title_en: "Endemic Tree Reforestation",
       tag: "Restorasi Ekologis",
+      tag_en: "Ecological Restoration",
       desc: "Penanaman kembali bibit Meranti dan Ulin purba di lahan konservasi untuk memulihkan daya serap karbon alami.",
+      desc_en: "Replanting native Meranti and ancient Ironwood saplings in conservation lands to restore natural carbon absorption capacity.",
       extra: "Program reboisasi menggunakan bibit pohon bernilai konservasi tinggi yang mampu bertahan di tanah miskin hara dan mengembalikan keanekaragaman hayati tanah rimba.",
+      extra_en: "Reforestation utilizes high conservation value native species capable of thriving in depleted soils and revitalizing biodiversity.",
       theme: "emerald"
     }
   ];
@@ -2859,13 +3154,29 @@ document.addEventListener("DOMContentLoaded", () => {
   // Helper Membuka Modal Pop-up dengan Pewarnaan Dinamis Sesuai Tema Kartu (Hijau untuk Konservasi/Restorasi, Merah untuk Bahaya/Sanksi)
   function openCardModal(imgSrc, tagText, titleText, descText, extraText, themeOverride) {
     if (!cardModal) return;
+    const isEnModal = typeof window.getHkLanguage === "function" && window.getHkLanguage() === "en";
+    let finalTitle = titleText;
+    let finalTag = tagText;
+    let finalDesc = descText;
+    let finalExtra = extraText;
+
+    if (isEnModal) {
+      const match = GALLERY_DETAIL_DATA.find((item) => item.title === titleText || item.title_en === titleText);
+      if (match) {
+        finalTitle = match.title_en || match.title;
+        finalTag = match.tag_en || match.tag;
+        finalDesc = match.desc_en || match.desc;
+        finalExtra = match.extra_en || match.extra;
+      }
+    }
+
     if (modalImg) modalImg.src = imgSrc || "assets/images/bg-hero-slide2.webp";
-    if (modalTag) modalTag.textContent = tagText || "Dokumentasi";
-    if (modalTitle) modalTitle.textContent = titleText || "";
-    if (modalDesc) modalDesc.textContent = descText || "";
+    if (modalTag) modalTag.textContent = finalTag || (isEnModal ? "Documentation" : "Dokumentasi");
+    if (modalTitle) modalTitle.textContent = finalTitle || "";
+    if (modalDesc) modalDesc.textContent = finalDesc || "";
     if (modalExtra) {
-      modalExtra.textContent = extraText || "";
-      modalExtra.style.display = extraText ? "block" : "none";
+      modalExtra.textContent = finalExtra || "";
+      modalExtra.style.display = finalExtra ? "block" : "none";
     }
 
     const dialog = cardModal.querySelector(".site-modal-dialog");
@@ -2933,13 +3244,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const rawIndex = parseInt(card.getAttribute("data-index"), 10) || 0;
       const dataDetail = GALLERY_DETAIL_DATA[rawIndex % GALLERY_DETAIL_DATA.length];
+      const isEnDoc = isEnglishLang();
 
       openCardModal(
         imgEl ? imgEl.src : "",
-        tagEl ? tagEl.textContent.trim() : (dataDetail ? dataDetail.tag : "Galeri Rimba"),
-        titleEl ? titleEl.textContent.trim() : (dataDetail ? dataDetail.title : ""),
-        descEl ? descEl.textContent.trim() : (dataDetail ? dataDetail.desc : ""),
-        dataDetail ? dataDetail.extra : "",
+        tagEl ? tagEl.textContent.trim() : (dataDetail ? (isEnDoc ? dataDetail.tag_en : dataDetail.tag) : (isEnDoc ? "Action Gallery" : "Galeri Rimba")),
+        titleEl ? titleEl.textContent.trim() : (dataDetail ? (isEnDoc ? dataDetail.title_en : dataDetail.title) : ""),
+        descEl ? descEl.textContent.trim() : (dataDetail ? (isEnDoc ? dataDetail.desc_en : dataDetail.desc) : ""),
+        dataDetail ? (isEnDoc ? dataDetail.extra_en : dataDetail.extra) : "",
         dataDetail ? dataDetail.theme : "emerald"
       );
     });
@@ -2950,6 +3262,7 @@ document.addEventListener("DOMContentLoaded", () => {
   crisisHalves.forEach((half) => {
     half.style.cursor = "pointer";
     half.addEventListener("click", () => {
+      const isEnCrisis = isEnglishLang();
       const img = half.querySelector(".crisis-half-img");
       const title = half.querySelector(".crisis-title-in-photo");
       const desc = half.querySelector(".crisis-desc-in-photo");
@@ -2957,10 +3270,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
       openCardModal(
         img ? img.src : "",
-        pill ? pill.textContent.trim() : "Investigasi Krisis",
-        title ? title.textContent.trim() : "Dampak Kerusakan Lingkungan",
+        pill ? pill.textContent.trim() : (isEnCrisis ? "Crisis Investigation" : "Investigasi Krisis"),
+        title ? title.textContent.trim() : (isEnCrisis ? "Environmental Destruction Impact" : "Dampak Kerusakan Lingkungan"),
         desc ? desc.textContent.trim() : "",
-        "Perusakan hutan secara ilegal melanggar UU No. 18/2013 dan UU No. 32/2009 dengan ancaman sanksi pidana kurungan hingga 15 tahun dan denda ratusan miliar rupiah.",
+        isEnCrisis
+          ? "Illegal forest destruction violates Law No. 18/2013 and Law No. 32/2009, carrying criminal penalties of up to 15 years imprisonment and fines reaching hundreds of billions of rupiah."
+          : "Perusakan hutan secara ilegal melanggar UU No. 18/2013 dan UU No. 32/2009 dengan ancaman sanksi pidana kurungan hingga 15 tahun dan denda ratusan miliar rupiah.",
         "danger"
       );
     });
@@ -3013,29 +3328,44 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (btnPledge) {
     btnPledge.addEventListener("click", () => {
+      const isEn = isEnglishLang();
       btnPledge.classList.add("pledged");
       btnPledge.innerHTML = `
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="20 6 9 17 4 12"></polyline>
         </svg>
-        <span>Ikrar Anda Telah Tercatat!</span>
+        <span>${isEn ? "Your Pledge Is Recorded!" : "Ikrar Anda Telah Tercatat!"}</span>
       `;
-      window.showToast("Terima kasih atas komitmen Anda menjaga kelestarian rimba Indonesia!");
+      window.showToast(
+        isEn
+          ? "Thank you for your commitment to safeguarding Indonesia's rainforests!"
+          : "Terima kasih atas komitmen Anda menjaga kelestarian rimba Indonesia!"
+      );
     });
   }
 
   if (btnShare) {
     btnShare.addEventListener("click", () => {
-      const shareData = {
-        title: "HutanKita - Edukasi & Pelestarian Hutan Tropis Indonesia",
-        text: "Mari bersama menjaga dan melestarikan paru-paru dunia rimba nusantara!",
-        url: window.location.href
-      };
+      const isEn = isEnglishLang();
+      const shareData = isEn
+        ? {
+            title: "HutanKita - Indonesian Tropical Rainforest Education & Conservation",
+            text: "Let's unite to safeguard and preserve the archipelago's lungs of the world!",
+            url: window.location.href
+          }
+        : {
+            title: "HutanKita - Edukasi & Pelestarian Hutan Tropis Indonesia",
+            text: "Mari bersama menjaga dan melestarikan paru-paru dunia rimba nusantara!",
+            url: window.location.href
+          };
 
       if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
         navigator.share(shareData).catch(() => { });
       } else {
-        window.copyToClipboard(window.location.href, "Tautan edukasi rimba disalin ke clipboard!");
+        window.copyToClipboard(
+          window.location.href,
+          isEn ? "Rainforest education link copied to clipboard!" : "Tautan edukasi rimba disalin ke clipboard!"
+        );
       }
     });
   }
@@ -3053,9 +3383,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Global Helper: Salin Teks ke Clipboard
   window.copyToClipboard = function (text, successMessage) {
+    const defaultMsg = isEnglishLang() ? "Copied to clipboard!" : "Berhasil disalin ke clipboard!";
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(() => {
-        window.showToast(successMessage || "Berhasil disalin ke clipboard!");
+        window.showToast(successMessage || defaultMsg);
       });
     } else {
       const tempInput = document.createElement("input");
@@ -3064,7 +3395,7 @@ document.addEventListener("DOMContentLoaded", () => {
       tempInput.select();
       document.execCommand("copy");
       document.body.removeChild(tempInput);
-      window.showToast(successMessage || "Berhasil disalin ke clipboard!");
+      window.showToast(successMessage || defaultMsg);
     }
   };
 
@@ -3257,12 +3588,20 @@ document.addEventListener("DOMContentLoaded", () => {
     const startTime = Date.now();
     const minDisplayDuration = 750; // Minimal display duration for smooth feel
 
-    const statusStages = [
-      { max: 30, text: "Memuat aset visual rimba..." },
-      { max: 65, text: "Menyiapkan koordinat satelit..." },
-      { max: 90, text: "Menyinkronkan data ekosistem..." },
-      { max: 100, text: "Siap menjelajah rimba nusantara..." }
-    ];
+    const isEnPreload = isEnglishLang();
+    const statusStages = isEnPreload
+      ? [
+          { max: 30, text: "Loading rainforest visual assets..." },
+          { max: 65, text: "Preparing satellite coordinates..." },
+          { max: 90, text: "Synchronizing ecosystem data..." },
+          { max: 100, text: "Ready to explore the archipelago..." }
+        ]
+      : [
+          { max: 30, text: "Memuat aset visual rimba..." },
+          { max: 65, text: "Menyiapkan koordinat satelit..." },
+          { max: 90, text: "Menyinkronkan data ekosistem..." },
+          { max: 100, text: "Siap menjelajah rimba nusantara..." }
+        ];
 
     function updateStatus(val) {
       if (!statusText) return;
@@ -3312,7 +3651,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function dismissPreloader() {
       if (progressBar) progressBar.style.width = "100%";
       if (percentText) percentText.textContent = "100%";
-      if (statusText) statusText.textContent = "Selamat datang di HutanKita";
+      if (statusText) statusText.textContent = isEnPreload ? "Welcome to HutanKita" : "Selamat datang di HutanKita";
 
       setTimeout(() => {
         preloader.classList.add("is-loaded");
